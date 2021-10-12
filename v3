@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Mon Oct 11 17:23:33 2021
+
+@author: osher
+"""
+
+
+import pandas as pd
+import numpy as np
+import plotly.io as pio
+import plotly.express as px
+pio.renderers.default='browser' #générer graphique dans browser
+import itertools
+
+
+#méthode 2
+longueur = list(range(5,15))
+hauteur = list(range(7,17))
+combinaisons = list(itertools.product(longueur,hauteur)) #créer toutes les combinaisons de variables
+
+list_values=[] #liste vide pour contenir nombre de chaises 
+list_tableaux=[]
+
+for i in range(100):
+
+    tableau = pd.DataFrame(combinaisons)
+    tableau[2]=([0]*len(combinaisons)) #ajouter colonne groupe
+    tableau.columns=("Largeur","Longueur","Groupe") #nommer colonnes
+    tableau["Groupe"]=pd.Categorical(tableau["Groupe"], categories=[0,1], ordered=True)
+    exclus=tableau.loc[tableau["Groupe"]==1] #initialiser liste vide de couples exclus
+    tableau_actif=tableau #initialiser liste complète de couples actifs
+
+    while len(tableau_actif>=1):
+        num_ligne = tableau_actif.sample().index[0] #choisir chaise au hasard
+        tableau.iloc[[num_ligne],2]=1 #assigner groupe à 1
+        couple = tableau.iloc[num_ligne,0:2].values #obtenir couple de valeurs
+        dist= np.sqrt(((tableau_actif.iloc[:,0].values-couple[0])**2)+((tableau_actif.iloc[:,1].values-couple[1])**2)) #distance euclidienne avec tous autres couples actifs
+        exclus2 = tableau_actif.loc[dist<2,:] #exclure couple à moins de 2 mètres parmi les couples actifs
+        exclus = pd.concat([exclus,exclus2]) #concaténer les nouveaux couples exclus aux anciens
+        tableau_actif = tableau.loc[~tableau.index.isin(exclus.index)] #mettre à jour tableau couples actifs
+    
+    list_values.append((tableau["Groupe"]==1).sum())
+    tableau_i = tableau
+    list_tableaux.append(tableau_i)
+
+meilleur_nombre=max(list_values) #meilleur nombre de chaises trouvé
+meilleure_iteration=list_values.index(meilleur_nombre) #meilleure itération parmi le loop
+meilleur_tableau=list_tableaux[meilleure_iteration] #tableau des groupes de la meilleure itération
+couples= meilleur_tableau.loc[(meilleur_tableau["Groupe"]==1),["Longueur","Largeur"]].values #sortir couples de chaises occupées
+# print(list_values)
+# print(couples)
+print(meilleur_nombre)
+
+px.scatter(meilleur_tableau,x="Largeur",y="Longueur", color="Groupe", size=([1]*len(meilleur_tableau))) #graphique de la salle
+
+#transformer en fonction
+#raffiner graphique, paralléliser ?
+
+
+
