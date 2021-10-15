@@ -5,7 +5,7 @@ Created on Thu Oct 14 12:20:38 2021
 
 @author: osher
 """
-from datetime import datetime #calculer temps éxécution
+#from datetime import datetime #calculer temps éxécution
 import pandas as pd
 import numpy as np
 import plotly.io as pio
