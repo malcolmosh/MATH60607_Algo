@@ -6,7 +6,7 @@ Created on Mon Oct 11 17:23:33 2021
 @author: osher
 """
 
-
+from datetime import datetime #calculer temps éxécution
 import pandas as pd
 import numpy as np
 import plotly.io as pio
@@ -14,17 +14,17 @@ import plotly.express as px
 pio.renderers.default='browser' #pour générer graphiques plotly dans browser
 import itertools
 
+# start=datetime.now() #calculer temps éxécution
+
 
 #On commence par initialiser une salle de cours carrée, en construisant deux vecteurs.
 longueur = list(range(5,15)) #un vecteur qui représente en mètres la position des chaises sur la longueur
-hauteur = list(range(7,17)) #un vecteur qui représente en mètres la position des chaises sur la hauteur
+hauteur = list(range(5,15)) #un vecteur qui représente en mètres la position des chaises sur la hauteur
 combinaisons = list(itertools.product(longueur,hauteur)) #créer toutes les combinaisons de variables possibles. 
 
 
-max(longueur)
-
 #Voici le graphe des chaises dans la salle de classe
-px.scatter(x=np.array(combinaisons)[:,0],y=np.array(combinaisons)[:,1], size=([1]*len(combinaisons)),range_x=[0,max(longueur)+1], range_y=[0,max(hauteur)+1]) #graphique de la salle
+#px.scatter(x=np.array(combinaisons)[:,0],y=np.array(combinaisons)[:,1], size=([1]*len(combinaisons)),range_x=[0,max(longueur)+1], range_y=[0,max(hauteur)+1]) #graphique de la salle
 
 
 #ALGORITHME
@@ -65,10 +65,11 @@ couples= meilleur_tableau.loc[(meilleur_tableau["Groupe"]==1),["Longueur","Large
 # print(couples)
 print(meilleur_nombre)
 
+# print( datetime.now()-start ) #calculer temps éxécution
+
 #graphique de la salle optimale
-px.scatter(meilleur_tableau,x="Largeur",y="Longueur", color="Groupe", size=([1]*len(meilleur_tableau)), range_x=[0,max(longueur)+1], range_y=[0,max(hauteur)+1]) 
+#px.scatter(meilleur_tableau,x="Largeur",y="Longueur", color="Groupe", size=([1]*len(meilleur_tableau)), range_x=[0,max(longueur)+1], range_y=[0,max(hauteur)+1]) 
 
 #transformer en fonction
 #raffiner graphique, paralléliser ?
-
 
