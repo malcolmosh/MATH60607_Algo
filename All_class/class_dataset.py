@@ -3,9 +3,9 @@ import os
 class dataset:
     def __init__(self):
         #Paths of the origin folder & the data folder, list of all files in the data folder
-        self.folder = "\Data"
-        self.path_origin = str(pathlib.Path(__file__).parent.parent.resolve())
-        self.path_data = self.path_origin + self.folder
+        self.folder = "Data"
+        self.path_origin = str(pathlib.Path(__file__).parents[1].resolve())
+        self.path_data = self.path_origin + "\\" + self.folder
         self.data_files = os.listdir(self.path_data)
         self.data_selection = None
 
