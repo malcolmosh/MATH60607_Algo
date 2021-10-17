@@ -1,5 +1,3 @@
-import pathlib
-import os
 from All_class.class_dataset import dataset
 
 data = dataset()
