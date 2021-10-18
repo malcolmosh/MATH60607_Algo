@@ -1,6 +1,6 @@
 import pathlib
 import os
-class dataset:
+class Dataset:
     def __init__(self):
         #Paths of the origin folder & the data folder, list of all files in the data folder
         self.folder = "Data"
@@ -13,15 +13,13 @@ class dataset:
         #Fonction that show all the files in the self.folder
         return self.data_files
     
-    def data_selection_list(self, selection, transformation_int=False):
+    def data_selection_list(self, selection):
         #Fonction that create a list of all lines in the file, each line is a list
-        #The transformation_int parameter is optional, if True, all the values will be transform in integer
         self.data_selection = selection
         data_list = []
         with open(self.path_data + "\\" + self.data_selection,"r") as f:
             f.readline() #Skip the 1st line (Header)
             for line in f:
-                data_list.append(line.rstrip().split("\t"))
-        if transformation_int == True:
-            data_list = [[int(item) for item in chair] for chair in data_list]
+                info = line.rstrip().split("\t")
+                data_list.append([int(info[0]), float(info[1]), float(info[2]), bool(0)])
         return data_list
