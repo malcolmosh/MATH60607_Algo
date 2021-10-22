@@ -14,38 +14,29 @@ pio.renderers.default='browser' #pour générer graphiques plotly dans browser
 import itertools
 import random #sélection aléatoire
 
-#importations qui sont faites dans la classe
-import os 
+#importations classe
+from All_class.class_dataset import Dataset
 
 #commentaires
 #transformer boolean importation en 0 ? np.array transforme en 0 anyway
 
-#IMPORTATION SALLE
-def chairs_list(path):
-    #Fonction that create a list of all lines in the file, each line is a list
-    data_list = []
-    with open(os.path.join(os.getcwd(),"Data",path),"r") as f:
-        f.readline() #Skip the 1st line (Header)
-        for line in f:
-            info = line.rstrip().split("\t")
-            data_list.append([int(info[0]), float(info[1]), float(info[2]), bool(0)])
-    return data_list
 
+data = Dataset()
+print(data.list_files())
+data_selection = data.chairs_list("salle_test54.txt")
 
-plan_salle = np.array(chairs_list("salle_test54.txt"))
 
 #Voici le graphe des chaises dans la salle de classe
-px.scatter(x=plan_salle[:,1],y=plan_salle[:,2], size=([1]*len(plan_salle)),range_x=[0,max(plan_salle[:,1])+1], range_y=[0,max(plan_salle[:,2])+1]) #graphique de la salle
+#transformer en array avant
+px.scatter(x=data_selection[:,1],y=data_selection[:,2], size=([1]*len(data_selection)),range_x=[0,max(data_selection[:,1])+1], range_y=[0,max(data_selection[:,2])+1]) #graphique de la salle
 
 #DÉBUT ALGORITHME
-
-algo_capacite(plan_salle,1000,2)
-
 def algo_capacite(data,iterations,distanciation):
     
     liste_capacite=[] #liste vide pour contenir nombre de chaises retenu par itération 
     list_tableaux=[] #liste vide qui contiendra le plan de salle par itération
-    
+    data=np.array(data) #convertir fichier données en array
+     
     for i in range(iterations): #répéter un grande nombre de fois
     
         chaises=data[:,1:4].copy() #initialiser array chaises 
@@ -84,6 +75,7 @@ def algo_capacite(data,iterations,distanciation):
     print(f"La capacité optimale de la salle est de {capacite_optimale:.0f} places") #print capacité optimale
 
 
+algo_capacite(plan_salle,1000,2)
 
 #FIN FONCTION
 

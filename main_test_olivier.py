@@ -1,9 +1,10 @@
 from All_class.class_dataset import Dataset
 from All_class.class_optimization_random import Optimization_random
 from All_class.class_application import Application
-import random, pathlib, os, pygame, math
+import random, pathlib, os, math, pygame
 from sys import exit
 
+    
 ### Assigner la class Dataset à la variable "data"     
 data = Dataset()
 ### Print le résultat de la fonction list_files() de la classe Dataset
