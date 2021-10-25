@@ -6,22 +6,26 @@ from sys import exit
 
 
 ##test avec mes classes
-from All_class.class_dataset_olivier import Dataset, salle, algo1
+from All_class.class_dataset_olivier import Dataset, salle
+from All_class.class_voisins_exclus import Voisins_exclus
 
 data=Dataset('Data')
 print(data)
 
-salle_classe=salle("Data","salle_test54.txt")
+data.data_files 
+
+salle_classe=salle("Data","Salle Saine Marketing.txt")
 print(salle_classe)
 
 salle_1=salle_classe.chairs_list()
+
 print(salle_1)
 
-optimize1=algo1(testdata,2,600)
+optimize1=Voisins_exclus(salle_1,2,1000)
 optimize1.rouler()
-optimize1.graphe_entree()
-optimize1.graphe_sortie()
-
+#optimize1.graphe_entree()
+#optimize1.graphe_sortie()
+optimize1.tableau()
 
 from All_class.class_dataset import Dataset
 ### Assigner la class Dataset à la variable "data"     
