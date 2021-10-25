@@ -5,7 +5,7 @@ from sys import exit
 
 
 
-#test avec mes classes
+##test avec mes classes
 from All_class.class_dataset_olivier import Dataset, salle, algo1
 
 data=Dataset('Data')
