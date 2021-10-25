@@ -1,11 +1,32 @@
-from All_class.class_dataset import Dataset
 from All_class.class_optimization_random import Optimization_random
 from All_class.class_application import Application
-import random, pathlib, os, pygame, math
+#import random, pathlib, os, math, pygame
 from sys import exit
 
+
+
+##test avec mes classes
+from All_class.class_dataset_olivier import Dataset, salle, algo1
+
+data=Dataset('Data')
+print(data)
+
+salle_classe=salle("Data","salle_test54.txt")
+print(salle_classe)
+
+salle_1=salle_classe.chairs_list()
+print(salle_1)
+
+optimize1=algo1(testdata,2,600)
+optimize1.rouler()
+optimize1.graphe_entree()
+optimize1.graphe_sortie()
+
+
+from All_class.class_dataset import Dataset
 ### Assigner la class Dataset à la variable "data"     
 data = Dataset()
+
 ### Print le résultat de la fonction list_files() de la classe Dataset
 print(data.list_files())
 ### Assigner à le résultat de la fonction data_selection_list() de la classe Dataset à la variable "data_selection" 
