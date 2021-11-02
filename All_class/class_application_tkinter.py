@@ -102,3 +102,4 @@ class Application():
         file_name = os.path.basename(os.path.normpath(self.file_path))
         self.label_data_actual.configure(text=file_name)
 
+app = Application()
