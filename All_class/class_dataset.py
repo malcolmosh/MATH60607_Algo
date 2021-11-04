@@ -16,11 +16,20 @@ class Salles: #nouvelle classe
         self.selection= selection #nom dossier
 
     #Créer une liste à partir du fichier sélection : chaque ligne est une liste 
-        data_list = []
+        data_chair = []
         with open(os.path.join(self.path_data,self.selection),"r") as f:
-            f.readline() #Skip the 1st line (Header)
+            f.readline() #Skip the 1st line (Header of info)
+            line = f.readline()
+            data = line.rstrip().split("\t")
+            data_info = {"width":float(data[0]), "height":float(data[1])}
+            
+        with open(os.path.join(self.path_data,self.selection),"r") as f:
+            f.readline() #Skip the 1st line (Header of info)
+            f.readline() #Skip the 2nd line (Info)
+            f.readline() #Skip the 3rd line (Header)
             for line in f:
                 info = line.rstrip().split("\t")
-                data_list.append([int(info[0]), float(info[1]), float(info[2]), bool(0)])
-        return data_list
+                data_chair.append([int(info[0]), float(info[1]), float(info[2]), 0, str(info[3])])
+                
+        return data_info,data_chair
      
