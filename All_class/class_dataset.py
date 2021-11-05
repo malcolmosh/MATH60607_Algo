@@ -15,7 +15,6 @@ class Salles: #nouvelle classe
 
     def chairs_list(self, selection):
         self.selection= selection #nom dossier
-        print(self.selection)
     #Créer une liste à partir du fichier sélection : chaque ligne est une liste 
         data_chair = []
         with open(self.selection,"r") as f:
@@ -30,7 +29,7 @@ class Salles: #nouvelle classe
             f.readline() #Skip the 3rd line (Header)
             for line in f:
                 info = line.rstrip().split("\t")
-                data_chair.append([int(info[0]), float(info[1]), float(info[2]), str(info[3]),False])
+                data_chair.append([int(info[0]), str(info[1]), float(info[2]), float(info[3]),bool(0)])
                 
         return data_info,data_chair
     
