@@ -6,9 +6,9 @@ Created on Mon Oct 25 17:19:59 2021
 @author: osher
 """
 
-import plotly.io as pio
-import plotly.express as px
-pio.renderers.default='browser' #pour générer graphiques plotly dans browser
+#import plotly.io as pio
+#import plotly.express as px
+#pio.renderers.default='browser' #pour générer graphiques plotly dans browser
 import pandas as pd
 import random #sélection aléatoire
 import numpy as np
@@ -28,7 +28,15 @@ class Voisins_exclus:
     
     #rouler l'algorithme
     def rouler(self):    
-        data=np.array(self.data) #convertir fichier données en array
+        data=(self.data) #fichier donnees en entree
+       
+        orientations = [] #liste vide pour entreposer les orientations
+        
+        for row in data: 
+            orientations.append(row[1]) #ajouter le point cardinal à la liste
+            del row[1] # retirer la colonne des points cardinaux du fichier de données
+        
+        data=np.array(data) #convertir fichier données en array
         liste_capacite=[] #liste vide pour contenir nombre de chaises retenu par itération 
         list_tableaux=[] #liste vide qui contiendra le array final par itération
          
@@ -56,14 +64,20 @@ class Voisins_exclus:
         
             liste_capacite.append(exclus[:,2].sum()) #calculer nombre chaises occupées puis ajouter à la liste
             array_final=np.zeros((len(chaises),4)) #créer array rempli de 0 avec 4 colonnes
-            array_final[:,1:4]=exclus
-            array_final[:,0]=data[:,0]
-            array_final_i = array_final 
-            list_tableaux.append(array_final_i) #ajouter le tableau des chaises classées à la liste
+            array_final[:,1:4]=exclus #ajouter le choix final des chaises à ce nouvel array, array_final
+            array_final[:,0]=data[:,0] # ajouter le numero de chaise en première colonne de l'array final
+            array_final_i = array_final # ajouter le numero de l'itération à l'array actuel 
+            list_tableaux.append(array_final_i) #ajouter le tableau final des chaises classées à la liste
         
         capacite_optimale=max(liste_capacite) #meilleur nombre de chaises trouvé 
         meilleure_iteration=liste_capacite.index(capacite_optimale) #meilleure itération parmi le loop
         meilleur_tableau=list_tableaux[meilleure_iteration] #tableau des groupes de la meilleure itération
+        meilleur_tableau = meilleur_tableau.tolist() #convertir en liste
+        
+        #boucle pour ajouter l'orientation des chaises au tableau final
+        for index, row in enumerate(meilleur_tableau):
+            row.insert(1,orientations[index])
+            
         self.tableau_optimal=meilleur_tableau
         print(f"La capacité optimale de la salle est de {capacite_optimale:.0f} places") #print capacité optimale
     
@@ -74,22 +88,22 @@ class Voisins_exclus:
         else: #si on a roulé l'algorithme déjà, produire la meilleure sortie
             return(self.tableau_optimal)
         
-    #graphe initial de la salle
-    def graphe_entree(self): 
-        if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
-            print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
-        else: #si on a roulé l'algorithme déjà, sortir le graphique initial
-            graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
-            graphe.show()
+    # #graphe initial de la salle
+    # def graphe_entree(self): 
+    #     if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
+    #         print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
+    #     else: #si on a roulé l'algorithme déjà, sortir le graphique initial
+    #         graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
+    #         graphe.show()
             
-    #graphe final de la salle
-    def graphe_sortie(self): 
-        if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
-            print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
-        else: #si on a roulé l'algorithme déjà, sortir le graphique final
-            groups = pd.Categorical(self.tableau_optimal[:,3], categories=[0,1], ordered=True)
-            graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], color=groups, size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
-            graphe.show()
+    # #graphe final de la salle
+    # def graphe_sortie(self): 
+    #     if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
+    #         print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
+    #     else: #si on a roulé l'algorithme déjà, sortir le graphique final
+    #         groups = pd.Categorical(self.tableau_optimal[:,3], categories=[0,1], ordered=True)
+    #         graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], color=groups, size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
+    #         graphe.show()
         
     #a ajouter
     #couples= meilleur_tableau[meilleur_tableau[:,3]==1] #lignes des chaises sélectionnées
