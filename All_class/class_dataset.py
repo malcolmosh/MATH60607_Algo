@@ -50,6 +50,6 @@ class Salles: #nouvelle classe
             f.readline() #Skip the 3rd line (Header)
             for line in f:
                 info = line.rstrip().split("\t")
-                data_chair.append([int(info[0]), str(info[1]), float(info[2]), float(info[3]),False])
+                data_chair.append([int(info[0]), str(info[1]), float(info[2]), float(info[3]),bool(0)])
 
         return data_info,data_chair
