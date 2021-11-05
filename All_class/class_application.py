@@ -129,7 +129,7 @@ class Application():
         self.label_data_actual.configure(text=file_name)
 
         try:
-            self.data = Salles()
+            self.data = Salles(app=True)
             self.room, self.chairs = self.data.chairs_list(self.file_path)
             self.draw_graph()
             self.draw_chairs("before")
