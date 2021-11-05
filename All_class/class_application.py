@@ -53,7 +53,7 @@ class Application():
         self.label_algorithm.grid(row=2,column=0)
         self.label_algorithm_actual = Label(self.frame_settings,width=21,height=1,anchor="w",bg="#ffffff")
         self.label_algorithm_actual.grid(row=2,column=1)
-        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="disabled", width=41) #"readonly"
+        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly", width=41)
         self.combobox_algorithm.set("Choisir un algorithme")
         self.combobox_algorithm.grid(row=3, column=0,columnspan=2,pady=(0,10))
 
@@ -65,17 +65,17 @@ class Application():
         self.label_iteration_actual.grid(row=4,column=1)
         self.label_scale_iteration = Label(self.frame_settings,width=10, textvariable=self.iteration_var)
         self.label_scale_iteration.grid(row=5, column=0,pady=(0,10))
-        self.scale_iteration = Scale(self.frame_settings, from_=1, to=1000,resolution=10, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.iteration_var,state=DISABLED)
+        self.scale_iteration = Scale(self.frame_settings, from_=50, to=10000,resolution=50, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.iteration_var,state=DISABLED)
         self.scale_iteration.grid(row=5, column=1,pady=(0,10))
 
-        self.maximum_time_var = IntVar(value=5)
+        self.maximum_time_var = IntVar(value=10)
         self.label_maximum_time = Label(self.frame_settings, text="Durée maximale (minutes)",width=20,height=1,anchor="w")
         self.label_maximum_time.grid(row=6,column=0)
         self.label_maximum_time_actual = Label(self.frame_settings,width=21,height=1,anchor="w",bg="#ffffff")
         self.label_maximum_time_actual.grid(row=6,column=1)
         self.label_maximum_time = Label(self.frame_settings,width=10, textvariable=self.maximum_time_var)
         self.label_maximum_time.grid(row=7, column=0,pady=(0,10))
-        self.scale_maximum_time = Scale(self.frame_settings, from_=1, to=120,resolution=5, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.maximum_time_var, state=DISABLED)
+        self.scale_maximum_time = Scale(self.frame_settings, from_=5, to=120,resolution=5, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.maximum_time_var, state=DISABLED)
         self.scale_maximum_time.grid(row=7, column=1,pady=(0,10))
 
         self.distance_var = DoubleVar(value=2.0)
@@ -85,11 +85,8 @@ class Application():
         self.label_distance_actual.grid(row=8,column=1)
         self.label_distance = Label(self.frame_settings,width=10, textvariable=self.distance_var)
         self.label_distance.grid(row=9, column=0,pady=(0,10))
-        self.scale_distance = Scale(self.frame_settings, from_=0.00, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var,state=DISABLED)
+        self.scale_distance = Scale(self.frame_settings, from_=0.1, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var,state=DISABLED)
         self.scale_distance.grid(row=9, column=1,pady=(0,10))
-
-        self.button_save = Button(self.frame_settings, text="Changer les paramètres", width=30,height=1,command=self.change_settings, fg="#000000",state=DISABLED)
-        self.button_save.grid(row=11, column=0, columnspan=2,pady=(0,10))
 
         self.show_radius = BooleanVar()
         self.show_radius.set(False)
@@ -99,7 +96,7 @@ class Application():
         self.count_use = 0
         self.count_notuse = 0
         for each in self.chairs:
-            if each[3] == True: self.count_use += 1
+            if each[4] == True: self.count_use += 1
             else: self.count_notuse += 1
         self.count_total = self.count_use + self.count_notuse
         self.canvas_graph.delete("all")
@@ -120,15 +117,6 @@ class Application():
         text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Chaises non utilisées", anchor="w")
         text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w")
         text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w")
-    def change_settings(self):
-        if self.combobox_algorithm.get() != "Choisir un algorithme":
-            self.label_algorithm_actual.configure(text=self.combobox_algorithm.get())
-            self.combobox_algorithm.set("Choisir un algorithme")
-            self.combobox_algorithm.selection_clear()
-
-        self.label_iteration_actual.configure(text=self.scale_iteration.get())
-        self.label_maximum_time_actual.configure(text=self.scale_maximum_time.get())
-        self.label_distance_actual.configure(text=self.scale_distance.get())
 
     def pick_file(self):
 
@@ -143,12 +131,25 @@ class Application():
         try:
             self.data = Salles()
             self.room, self.chairs = self.data.chairs_list(self.file_path)
-            #self.combobox_algorithm.set(state="readonly")
             self.draw_graph()
             self.draw_chairs("before")
+            self.scale_iteration.configure(state=NORMAL)
+            self.scale_maximum_time.configure(state=NORMAL)
+            self.scale_distance.configure(state=NORMAL)
+            self.button_optimisation.configure(state=NORMAL)
         except:
             print("Fichier non valide")
     def optimization(self):
+        #save settings
+        if self.combobox_algorithm.get() != "Choisir un algorithme":
+            self.label_algorithm_actual.configure(text=self.combobox_algorithm.get())
+            self.combobox_algorithm.set("Choisir un algorithme")
+            self.combobox_algorithm.selection_clear()
+
+        self.label_iteration_actual.configure(text=self.scale_iteration.get())
+        self.label_maximum_time_actual.configure(text=self.scale_maximum_time.get())
+        self.label_distance_actual.configure(text=self.scale_distance.get())
+        #optimisation
         if self.label_algorithm_actual.cget("text") == "Optimization random":
             opti = Optimization_random(self.chairs)
             self.chairs = opti.optimize(rate_use=50)
@@ -159,6 +160,7 @@ class Application():
             test = opti.rouler()
             # self.draw_graph()
             # self.draw_chairs("after")
+        self.button_show_radius.configure(state=NORMAL)
     def circle(self):
         wantcircle = self.show_radius.get()
         if wantcircle == True:
@@ -200,23 +202,19 @@ class Application():
 
         #64 pixel = 75 cm    espace = 700x600 pixel 8.203125 metres x 7.03125 metres
 
-        self.canvas_chairs.delete("all")
-        width_scale = 64
-        lenght_scale = 64
-        # resized_image= img.resize((300,205), Image.ANTIALIAS)
-        # new_image= ImageTk.PhotoImage(resized_image)    
+        self.canvas_chairs.delete("all") 
         for chair in self.chairs: 
-            pos_x = (chair[1]*scale_x) + pos_x_buffer
-            pos_y = self.gui_build["canvas_chairs"]["height"] - ((chair[2] * scale_y) + pos_y_buffer)
-            direction = chair[4]
+            pos_x = (chair[2]*scale_x) + pos_x_buffer
+            pos_y = self.gui_build["canvas_chairs"]["height"] - ((chair[3] * scale_y) + pos_y_buffer)
+            orientation = chair[1]
             if state == "before":
-                self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[direction]["brown"])
+                self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["brown"])
             elif state == "after":
-                if chair[3] == 1:
-                    self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[direction]["green"])
+                if chair[4] == True:
+                    self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["green"])
                     if circle == True: #64 pixel = 75 cm --> donc distance (m) * 85.33 = nb pixel
                         pass
                         radius = int(self.label_distance_actual.cget("text"))*85.33
                         self.canvas_chairs.create_oval((pos_x - radius),(pos_y - radius),(pos_x + radius),(pos_y + radius),width=2,outline="#00ff0d")
                 else:
-                    self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[direction]["brown"])
+                    self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["brown"])

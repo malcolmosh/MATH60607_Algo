@@ -7,5 +7,5 @@ class Optimization_random:
         elif rate_use < 0: rate_use = 0
         elif rate_use > 100: rate_use = 100
         #Comprehension list to choose a bool value for each chair | The [0] is because the random.choices return a list of k element (by defaut k=1)
-        self.data = [[chair[0],chair[1],chair[2],random.choices([True, False],[rate_use, 100 - rate_use])[0],chair[4]] for chair in self.data]
+        self.data = [[chair[0],chair[1],chair[2],chair[3],random.choices([True, False],[rate_use, 100 - rate_use])[0]] for chair in self.data]
         return self.data
