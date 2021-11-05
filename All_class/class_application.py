@@ -6,7 +6,7 @@ from PIL import Image,ImageTk
 from sys import exit
 from All_class.class_dataset import Salles
 from All_class.class_optimization_random import Optimization_random
-from All_class.class_voisins_exclus import Voisins_exclus
+# from All_class.class_voisins_exclus import Voisins_exclus
 
 class Application():
     def __init__(self):
@@ -34,7 +34,7 @@ class Application():
         self.frame_settings = LabelFrame(self.root,text="Settings",width=self.gui_build["frame_settings"]["width"],height=self.gui_build["frame_settings"]["height"],bg=self.gui_build["frame_settings"]["color"])
         self.frame_settings.place(x=self.gui_build["frame_settings"]["posx"], y=self.gui_build["frame_settings"]["posy"])
 
-        self.button_optimisation = Button(self.root,text="Optimiser la salle!",width=self.gui_build["button_optimisation"]["width"],height=self.gui_build["button_optimisation"]["height"],command=self.optimization,bg=self.gui_build["button_optimisation"]["color"])
+        self.button_optimisation = Button(self.root,text="Optimiser la salle!",width=self.gui_build["button_optimisation"]["width"],height=self.gui_build["button_optimisation"]["height"],command=self.optimization,bg=self.gui_build["button_optimisation"]["color"],state=DISABLED)
         self.button_optimisation.place(x=self.gui_build["button_optimisation"]["posx"], y=self.gui_build["button_optimisation"]["posy"])
 
         self.canvas_graph = Canvas(self.root,width=self.gui_build["canvas_graph"]["width"],height=self.gui_build["canvas_graph"]["height"],bg=self.gui_build["canvas_graph"]["color"])
@@ -53,7 +53,7 @@ class Application():
         self.label_algorithm.grid(row=2,column=0)
         self.label_algorithm_actual = Label(self.frame_settings,width=21,height=1,anchor="w",bg="#ffffff")
         self.label_algorithm_actual.grid(row=2,column=1)
-        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly", width=41)
+        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="disabled", width=41) #"readonly"
         self.combobox_algorithm.set("Choisir un algorithme")
         self.combobox_algorithm.grid(row=3, column=0,columnspan=2,pady=(0,10))
 
@@ -65,7 +65,7 @@ class Application():
         self.label_iteration_actual.grid(row=4,column=1)
         self.label_scale_iteration = Label(self.frame_settings,width=10, textvariable=self.iteration_var)
         self.label_scale_iteration.grid(row=5, column=0,pady=(0,10))
-        self.scale_iteration = Scale(self.frame_settings, from_=1, to=1000,resolution=10, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.iteration_var)
+        self.scale_iteration = Scale(self.frame_settings, from_=1, to=1000,resolution=10, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.iteration_var,state=DISABLED)
         self.scale_iteration.grid(row=5, column=1,pady=(0,10))
 
         self.maximum_time_var = IntVar(value=5)
@@ -75,7 +75,7 @@ class Application():
         self.label_maximum_time_actual.grid(row=6,column=1)
         self.label_maximum_time = Label(self.frame_settings,width=10, textvariable=self.maximum_time_var)
         self.label_maximum_time.grid(row=7, column=0,pady=(0,10))
-        self.scale_maximum_time = Scale(self.frame_settings, from_=1, to=120,resolution=5, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.maximum_time_var)
+        self.scale_maximum_time = Scale(self.frame_settings, from_=1, to=120,resolution=5, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.maximum_time_var, state=DISABLED)
         self.scale_maximum_time.grid(row=7, column=1,pady=(0,10))
 
         self.distance_var = DoubleVar(value=2.0)
@@ -85,14 +85,15 @@ class Application():
         self.label_distance_actual.grid(row=8,column=1)
         self.label_distance = Label(self.frame_settings,width=10, textvariable=self.distance_var)
         self.label_distance.grid(row=9, column=0,pady=(0,10))
-        self.scale_distance = Scale(self.frame_settings, from_=0.00, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var)
+        self.scale_distance = Scale(self.frame_settings, from_=0.00, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var,state=DISABLED)
         self.scale_distance.grid(row=9, column=1,pady=(0,10))
 
-        self.button_save = Button(self.frame_settings, text="Changer les paramètres", width=30,height=1,command=self.change_settings, fg="#000000")
+        self.button_save = Button(self.frame_settings, text="Changer les paramètres", width=30,height=1,command=self.change_settings, fg="#000000",state=DISABLED)
         self.button_save.grid(row=11, column=0, columnspan=2,pady=(0,10))
 
-        self.show_radius = IntVar()
-        self.button_show_radius = Checkbutton(self.frame_settings,text="Afficher les rayons de distanciation", width = 35,command=None, variable = self.show_radius)
+        self.show_radius = BooleanVar()
+        self.show_radius.set(False)
+        self.button_show_radius = Checkbutton(self.frame_settings,text="Afficher les rayons de distanciation", width = 35,command=self.circle, variable = self.show_radius,state=DISABLED)
         self.button_show_radius.grid(row=10, column=0, columnspan=2,pady=(0,10))
     def draw_graph(self):
         self.count_use = 0
@@ -141,11 +142,12 @@ class Application():
 
         try:
             self.data = Salles()
-            self.room, self.chairs = self.data.chairs_list(file_name)
+            self.room, self.chairs = self.data.chairs_list(self.file_path)
+            #self.combobox_algorithm.set(state="readonly")
+            self.draw_graph()
+            self.draw_chairs("before")
         except:
             print("Fichier non valide")
-        self.draw_graph()
-        self.draw_chairs("before")
     def optimization(self):
         if self.label_algorithm_actual.cget("text") == "Optimization random":
             opti = Optimization_random(self.chairs)
@@ -157,7 +159,13 @@ class Application():
             test = opti.rouler()
             # self.draw_graph()
             # self.draw_chairs("after")
-    def draw_chairs(self,state):  
+    def circle(self):
+        wantcircle = self.show_radius.get()
+        if wantcircle == True:
+            self.draw_chairs(state="after",circle=True)
+        else:
+            self.draw_chairs(state="after",circle=False)
+    def draw_chairs(self,state,circle=False):  
         if self.room["width"] >= (7/6)*self.room["height"]:
             scale_x = self.gui_build["canvas_chairs"]["width"] / self.room["width"]
             scale_y = self.gui_build["canvas_chairs"]["width"] / self.room["width"]
@@ -197,7 +205,7 @@ class Application():
         lenght_scale = 64
         # resized_image= img.resize((300,205), Image.ANTIALIAS)
         # new_image= ImageTk.PhotoImage(resized_image)    
-        for chair in self.chairs:
+        for chair in self.chairs: 
             pos_x = (chair[1]*scale_x) + pos_x_buffer
             pos_y = self.gui_build["canvas_chairs"]["height"] - ((chair[2] * scale_y) + pos_y_buffer)
             direction = chair[4]
@@ -206,5 +214,9 @@ class Application():
             elif state == "after":
                 if chair[3] == 1:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[direction]["green"])
+                    if circle == True: #64 pixel = 75 cm --> donc distance (m) * 85.33 = nb pixel
+                        pass
+                        radius = int(self.label_distance_actual.cget("text"))*85.33
+                        self.canvas_chairs.create_oval((pos_x - radius),(pos_y - radius),(pos_x + radius),(pos_y + radius),width=2,outline="#00ff0d")
                 else:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[direction]["brown"])
