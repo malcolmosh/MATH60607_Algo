@@ -2,7 +2,7 @@ import pathlib
 import os
 
 class Salles: #nouvelle classe
-    def __init__(self, folder_data="Data",app=False): 
+    def __init__(self, folder_data="Data",app=True): 
         self.app = app
         if self.app == False:
             #Paths of the origin folder & the data folder, list of all files in the data folder
