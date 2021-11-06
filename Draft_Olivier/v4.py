@@ -5,7 +5,7 @@ Created on Thu Oct 14 12:20:38 2021
 
 @author: osher
 """
-from datetime import datetime #calculer temps éxécution
+#from datetime import datetime #calculer temps éxécution
 import pandas as pd
 import numpy as np
 import plotly.io as pio
@@ -33,7 +33,7 @@ groupe[:,:-1] = combinaisons #remplir 2 premières colonnes de groupe par les co
 groupes_chaises = groupe #df principal
 
 #Voici le graphe des chaises dans la salle de classe
-#px.scatter(x=groupes_chaises[:,0],y=groupes_chaises[:,1], size=([1]*len(combinaisons)),range_x=[0,max(m_longueur)+1], range_y=[0,max(m_hauteur)+1]) #graphique de la salle
+px.scatter(x=groupes_chaises[:,0],y=groupes_chaises[:,1], size=([1]*len(combinaisons)),range_x=[0,max(m_longueur)+1], range_y=[0,max(m_hauteur)+1]) #graphique de la salle
 
 #ALGORITHME
 
@@ -42,7 +42,7 @@ list_tableaux=[] #liste vide qui contiendra un tableau des chaises occupées par
 
 for i in range(500): #itérer à travers l'algorithme un grande nombre de fois
 
-    exclus=np.zeros((len(combinaisons),3)) #initialiser liste vide exclus
+    exclus=np.zeros((len(combinaisons),3)) #initialiser des exclus (pleine de 0)
     chaises_actives=groupes_chaises.copy() #initialiser array chaises actives
 
     while (chaises_actives.sum()>0): #pendant qu'il y a encore des chaises en jeu 
