@@ -27,7 +27,7 @@ class Optimization_des_sections():
                     merge = False
                     for i in L:
                         for j in range(0,len(data_dataframe.num)):#0 to 54
-                            if i != j and data_dataframe.group[j]==0 and ((((data_dataframe.pos_x[i]-data_dataframe.pos_x[j])**2)+((data_dataframe.pos_y[i]-data_dataframe.pos_y[j])**2))**0.5) < 2:
+                            if i != j and data_dataframe.group[j]==0 and ((((data_dataframe.pos_x[i]-data_dataframe.pos_x[j])**2)+((data_dataframe.pos_y[i]-data_dataframe.pos_y[j])**2))**0.5) < self.distance:
                                 data_dataframe.group[j]=f
                                 L.append(j)
                                 merge = True
@@ -59,7 +59,7 @@ class Optimization_des_sections():
                                 dist=((((data_dataframe.pos_x[q]-data_dataframe.pos_x[p])**2)+((data_dataframe.pos_y[q]-data_dataframe.pos_y[p])**2))**0.5)
                                 if dist != 0 and dist<m:
                                     m=dist #minimum distance of q from all p already in sss
-                            if m<2:
+                            if m<self.distance:
                                 ddd.append(q) 
                             elif m<a:
                                 t=q
