@@ -13,7 +13,6 @@ class Salles: #nouvelle classe
         elif self.app == True:
             pass
         
-        
     # def __str__(self):
     #     return(f"Fichiers présents dans le dossier: {self.data_files}") 
 

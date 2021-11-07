@@ -15,11 +15,12 @@ import numpy as np
 
 class Voisins_exclus:
     
-    def __init__(self, data,distance,iterations=500):
-        self.data=data
-        self.iterations=iterations
-        self.distance=distance
-        self.tableau_optimal=() #vecteur qui contiendra la meilleure sortie de l'algorithme
+    def __init__(self, data,distance,iterations=500, maximum_time=5):
+        self.data = data
+        self.distance = distance
+        self.iterations = iterations
+        self.maximum_time = maximum_time
+        self.tableau_optimal = () #vecteur qui contiendra la meilleure sortie de l'algorithme
         
     #vérifier si les listes du début sont vides ou pas
     #voir https://stackoverflow.com/questions/32836291/check-if-object-attributes-are-non-empty-python
@@ -27,7 +28,7 @@ class Voisins_exclus:
         return bool(self.tableau_optimal)
     
     #rouler l'algorithme
-    def rouler(self):    
+    def optimize(self):    
         data=(self.data) #fichier donnees en entree
        
         orientations = [] #liste vide pour entreposer les orientations
@@ -78,8 +79,9 @@ class Voisins_exclus:
         for index, row in enumerate(meilleur_tableau):
             row.insert(1,orientations[index])
             
-        self.tableau_optimal=meilleur_tableau
-        print(f"La capacité optimale de la salle est de {capacite_optimale:.0f} places") #print capacité optimale
+        self.tableau_optimal = meilleur_tableau
+        return self.tableau_optimal
+        #print(f"La capacité optimale de la salle est de {capacite_optimale:.0f} places") #print capacité optimale
     
     #array de la meilleure itération
     def tableau(self): 
