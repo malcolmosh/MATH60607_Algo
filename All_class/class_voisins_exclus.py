@@ -6,9 +6,9 @@ Created on Mon Oct 25 17:19:59 2021
 @author: osher
 """
 
-#import plotly.io as pio
-#import plotly.express as px
-#pio.renderers.default='browser' #pour générer graphiques plotly dans browser
+import plotly.io as pio
+import plotly.express as px
+pio.renderers.default='browser' #pour générer graphiques plotly dans browser
 import pandas as pd
 import random #sélection aléatoire
 import numpy as np
@@ -80,32 +80,46 @@ class Voisins_exclus:
             row.insert(1,orientations[index])
             
         self.tableau_optimal = meilleur_tableau
-        return self.tableau_optimal
-        #print(f"La capacité optimale de la salle est de {capacite_optimale:.0f} places") #print capacité optimale
+        return self.tableau_optimal #sortir liste de la meilleure itération
     
-    #array de la meilleure itération
-    def tableau(self): 
+       
+    #imprimer le résultat de la meilleure itération
+    def resultat(self): 
         if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
             print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
         else: #si on a roulé l'algorithme déjà, produire la meilleure sortie
-            return(self.tableau_optimal)
+            somme = sum([row[4] for row in self.tableau_optimal])
+            print(f"La capacité optimale de la salle est de {somme:.0f} places") #print capacité optimale
+
+    # #array de la meilleure itération
+    # def tableau(self): 
+    #     if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
+    #         print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
+    #     else: #si on a roulé l'algorithme déjà, produire la meilleure sortie
+    #         return(self.tableau_optimal)
         
-    # #graphe initial de la salle
-    # def graphe_entree(self): 
-    #     if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
-    #         print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
-    #     else: #si on a roulé l'algorithme déjà, sortir le graphique initial
-    #         graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
-    #         graphe.show()
+    #graphe initial de la salle
+    def graphe_entree(self): 
+        if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
+            print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
+        else: #si on a roulé l'algorithme déjà, sortir le graphique initial
+            tableau = self.tableau_optimal
+            x_cord = [row[2] for row in tableau]
+            y_cord = [row[3] for row in tableau]
+            graphe = px.scatter(x=x_cord,y=y_cord,range_x=[0,max(x_cord)+1], size = [1]*len(tableau), range_y=[0,max(y_cord)+1]) 
+            graphe.show()   
             
-    # #graphe final de la salle
-    # def graphe_sortie(self): 
-    #     if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
-    #         print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
-    #     else: #si on a roulé l'algorithme déjà, sortir le graphique final
-    #         groups = pd.Categorical(self.tableau_optimal[:,3], categories=[0,1], ordered=True)
-    #         graphe = px.scatter(x=self.tableau_optimal[:,1],y=self.tableau_optimal[:,2], color=groups, size=([1]*len(self.tableau_optimal)),range_x=[0,max(self.tableau_optimal[:,1])+1], range_y=[0,max(self.tableau_optimal[:,2])+1]) 
-    #         graphe.show()
+    #graphe final de la salle
+    def graphe_sortie(self): 
+        if len(self.tableau_optimal)==0: #si l'algorithme n'a pas roulé encore
+            print("Vous devez d'abord utiiser rouler() pour lancer l'algorithme")
+        else: #si on a roulé l'algorithme déjà, sortir le graphique final
+            tableau = self.tableau_optimal
+            x_cord = [row[2] for row in tableau]
+            y_cord = [row[3] for row in tableau]
+            groups = pd.Categorical([row[4] for row in tableau], categories=[0,1], ordered=True)
+            graphe = px.scatter(x=x_cord,y=y_cord,color=groups, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
+            graphe.show()   
         
     #a ajouter
     #couples= meilleur_tableau[meilleur_tableau[:,3]==1] #lignes des chaises sélectionnées
