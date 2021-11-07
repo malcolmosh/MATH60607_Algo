@@ -31,9 +31,10 @@ class Salles: #nouvelle classe
             for line in f:
                 info = line.rstrip().split("\t")
                 data_chair.append([int(info[0]), str(info[1]), float(info[2]), float(info[3]),bool(0)])
-
+        for each in data_chair:
+            print(each)
         return data_info,data_chair
-    
+
     def chairs_list_test(self, selection):
         self.selection= selection #nom dossier
     #Créer une liste à partir du fichier sélection : chaque ligne est une liste 

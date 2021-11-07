@@ -1,5 +1,5 @@
 width	height		
-8.25	9.5		
+16.5	18		
 num	orient	pos_x	pos_y
 1	south	8.25	1.5
 2	est	1.5	3

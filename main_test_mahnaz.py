@@ -1,28 +1,19 @@
-from All_class.class_dataset import Dataset
+from All_class.class_dataset import Salles
 from All_class.class_optimization_random import Optimization_random
-from All_class.class_application import Application
-import random, pathlib, os, pygame, math
+from All_class.class_optimization_des_sections import Optimization_des_sections
+import random, pathlib, os, math
+import pandas as pd
 from sys import exit
 
-### Assigner la class Dataset à la variable "data"     
-data = Dataset()
-### Print le résultat de la fonction list_files() de la classe Dataset
-print(data.list_files())
-### Assigner à le résultat de la fonction data_selection_list() de la classe Dataset à la variable "data_selection" 
-data_selection = data.chairs_list("salle_test54.txt")
-for chair in data_selection:
-    print(chair)
-### Assigner à le résultat de la fonction room_info() de la classe Dataset à la variable "room_info"   
-room_info = data.room_info("salle_test54_info.txt")
-print(room_info)
+#appeler la méthode pour aller chercher les données
+data_method = Salles(folder_data='Data',app=False)
+info, data = data_method.chairs_list_test("Salle Saine Marketing.txt")
 
-### Assigner la classe Optimization_random à la variable "optimization"
-optimization = Optimization_random(data_selection)
-### Assigner à le résultat de la fonction optimize() de la classe Optimization_random à la variable "optimization_export"
-### Choix de la valeur 25 pour le paramètre optionel "rate_use"
-optimization_export = optimization.optimize(25)
-for chair in optimization_export:
-    print(chair)
+print(data)
+print("----------------------")
 
-app = Application(optimization_export, room_info)
-app.game_loop()
+opti = Optimization_des_sections(data, 4)
+data_optimize, opti_time = opti.optimize()
+
+print(f"Le temps total est de {round(opti_time,2)} secondes")
+print(data_optimize)

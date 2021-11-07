@@ -6,6 +6,7 @@ from PIL import Image,ImageTk
 from sys import exit
 from All_class.class_dataset import Salles
 from All_class.class_optimization_random import Optimization_random
+from All_class.class_optimization_des_sections import Optimization_des_sections
 from All_class.class_voisins_exclus import Voisins_exclus
 
 class Application():
@@ -40,7 +41,7 @@ class Application():
         self.canvas_graph = Canvas(self.root,width=self.gui_build["canvas_graph"]["width"],height=self.gui_build["canvas_graph"]["height"],bg=self.gui_build["canvas_graph"]["color"])
         self.canvas_graph.place(x=self.gui_build["canvas_graph"]["posx"], y=self.gui_build["canvas_graph"]["posy"])
 
-        self.algorithm_list = ["Voisins exclus", "Optimization random"]
+        self.algorithm_list = ["Voisins exclus", "Optimization random", "Optimization_des_sections"]
 
         self.label_data = Label(self.frame_settings, text="Data",width=20,height=1,anchor="w")
         self.label_data.grid(row=0,column=0)
@@ -155,13 +156,14 @@ class Application():
         if self.label_algorithm_actual.cget("text") == "Optimization random":
             opti = Optimization_random(self.chairs)
             self.chairs = opti.optimize(rate_use=50)
-            self.draw_graph()
-            self.draw_chairs("after")
         elif self.label_algorithm_actual.cget("text") == "Voisins exclus":
             opti = Voisins_exclus(self.chairs,2,500,5)
             self.chairs = opti.optimize()
-            self.draw_graph()
-            self.draw_chairs("after")
+        elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
+            opti = Optimization_des_sections(self.chairs,2,500,5)
+            self.chairs = opti.optimize()
+        self.draw_graph()
+        self.draw_chairs("after")
         self.button_show_radius.configure(state=NORMAL)
     def circle(self):
         wantcircle = self.show_radius.get()
