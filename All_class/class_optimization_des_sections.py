@@ -3,7 +3,7 @@ import pandas as pd
 import time
 
 class Optimization_des_sections():
-    def __init__(self, data,distance,iterations=500, maximum_time=5):
+    def __init__(self, data,distance,iterations=1, maximum_time=5):
         self.data = data
         self.distance = distance
         self.iterations = iterations
