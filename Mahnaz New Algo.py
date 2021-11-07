@@ -17,7 +17,7 @@ for n in range(0,len(data.num)):#0 to 54
                         data.group[j]=f
                         L.append(j)
                         merge = True
-        f=f+1   
+        f=f+1 
 #second section: finding available seats in each group/section & setting their availablity=1.
 #logic used here:
 #for each group we initialize a seat and add other seats based on their distance one by one.
