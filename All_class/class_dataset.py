@@ -10,12 +10,9 @@ class Salles: #nouvelle classe
             self.path_origin = str(pathlib.Path(__file__).parents[1].resolve()) #chemin d'accès repo
             self.path_data = os.path.join(self.path_origin,self.folder_data) #chemin d'accès dossier data
             self.data_files = os.listdir(self.path_data) #fichiers dans le dossier data
+            self.fichiers = (f"Fichiers présents dans le dossier: {self.data_files}")
         elif self.app == True:
             pass
-        
-        
-    # def __str__(self):
-    #     return(f"Fichiers présents dans le dossier: {self.data_files}") 
 
     def chairs_list(self, selection):
         self.selection= selection #nom dossier

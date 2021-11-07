@@ -6,7 +6,7 @@ from PIL import Image,ImageTk
 from sys import exit
 from All_class.class_dataset import Salles
 from All_class.class_optimization_random import Optimization_random
-# from All_class.class_voisins_exclus import Voisins_exclus
+from All_class.class_voisins_exclus import Voisins_exclus
 
 class Application():
     def __init__(self):
@@ -24,9 +24,9 @@ class Application():
     def gui(self):
         self.gui_build = {
             "canvas_chairs":{       "posx":10, "posy":10,  "width":700,    "height":600,   "color":"#f3bfbb"},
-            "frame_settings":{      "posx":720,"posy":10,  "width":300,    "height":370,   "color":"#bbf3df"},
-            "button_optimisation":{ "posx":720,"posy":380, "width":42,     "height":1,    "color":"yellow"}, #Pas le même système de width-height
-            "canvas_graph":{        "posx":720,"posy":415, "width":300,    "height":195,   "color":"#bbcff3"}}
+            "frame_settings":{      "posx":720,"posy":10,  "width":300,    "height":330,   "color":"#bbf3df"},
+            "button_optimisation":{ "posx":720,"posy":340, "width":42,     "height":1,    "color":"yellow"}, #Pas le même système de width-height
+            "canvas_graph":{        "posx":720,"posy":370, "width":300,    "height":240,   "color":"#bbcff3"}}
 
         self.canvas_chairs = Canvas(self.root,width=self.gui_build["canvas_chairs"]["width"],height=self.gui_build["canvas_chairs"]["height"],bg=self.gui_build["canvas_chairs"]["color"])
         self.canvas_chairs.place(x=self.gui_build["canvas_chairs"]["posx"], y=self.gui_build["canvas_chairs"]["posy"])
@@ -149,6 +149,8 @@ class Application():
         self.label_iteration_actual.configure(text=self.scale_iteration.get())
         self.label_maximum_time_actual.configure(text=self.scale_maximum_time.get())
         self.label_distance_actual.configure(text=self.scale_distance.get())
+        for chair in range(0,len(self.chairs)):
+            self.chairs[chair][4] = bool(False)
         #optimisation
         if self.label_algorithm_actual.cget("text") == "Optimization random":
             opti = Optimization_random(self.chairs)
@@ -157,9 +159,9 @@ class Application():
             self.draw_chairs("after")
         elif self.label_algorithm_actual.cget("text") == "Voisins exclus":
             opti = Voisins_exclus(self.chairs,2,500,5)
-            test = opti.rouler()
-            # self.draw_graph()
-            # self.draw_chairs("after")
+            self.chairs = opti.optimize()
+            self.draw_graph()
+            self.draw_chairs("after")
         self.button_show_radius.configure(state=NORMAL)
     def circle(self):
         wantcircle = self.show_radius.get()
