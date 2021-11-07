@@ -161,7 +161,7 @@ class Application():
             self.chairs = opti.optimize()
         elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
             opti = Optimization_des_sections(self.chairs,2,500,5)
-            self.chairs = opti.optimize()
+            self.chairs, self.time_total = opti.optimize()
         self.draw_graph()
         self.draw_chairs("after")
         self.button_show_radius.configure(state=NORMAL)
