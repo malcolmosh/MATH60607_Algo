@@ -81,9 +81,9 @@ class Voisins_exclus:
             
         self.tableau_optimal = meilleur_tableau
 
-        print("----")
-        for each in self.tableau_optimal:
-            print(each)
+        # print("----")
+        # for each in self.tableau_optimal:
+        #     print(each)
         return self.tableau_optimal #sortir liste de la meilleure itération
     
        
