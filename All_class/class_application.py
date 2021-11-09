@@ -215,7 +215,6 @@ class Application():
         elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
             opti = Optimization_des_sections(self.chairs,
                 float(self.gui_settings["Distance"]),
-                int(self.gui_settings["Iterations"]),
                 int(self.gui_settings["Time"]))
             self.chairs, self.time_total = opti.optimize()
         self.draw_graph()
