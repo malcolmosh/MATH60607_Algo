@@ -37,6 +37,9 @@ class Voisins_exclus:
     def optimize(self):    
         data=(self.data) #fichier donnees en entree
        
+        #vérifier l'heure
+        start=time.time()
+
         #liste vide pour entreposer les orientations
         orientations = [] 
         
@@ -50,8 +53,6 @@ class Voisins_exclus:
         liste_capacite=[] #liste vide pour contenir nombre de chaises retenu par itération 
         list_tableaux=[] #liste vide qui contiendra le array final par itération
          
-        #vérifier l'heure
-        start=time.time()
         #début de la boucle - répéter autant de fois qu'il y a d'itérations
         for i in range(self.iterations): 
             chaises=data[:,1:4].copy() #initialiser array chaises 
@@ -101,7 +102,6 @@ class Voisins_exclus:
             
                 while_index+=1
 
-            
             #enregistrer les sorties
             liste_capacite.append(exclus[:,2].sum()) #calculer nombre chaises occupées puis ajouter à la liste
             array_final=np.zeros((len(chaises),4)) #créer array rempli de 0 avec 4 colonnes
