@@ -15,7 +15,7 @@ test.fichiers
 info, salle_classe = test.chairs_list_test("Salle Saine Marketing - 1x1metre dist.txt")
 
 
-optimize1=Voisins_exclus(salle_classe,2,1000,methode=2)
+optimize1=Voisins_exclus(salle_classe,2,10000,methode=1, maximum_time=0.01)
 optimize1.optimize()
 optimize1.resultat()
 optimize1.interruption()
