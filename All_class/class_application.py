@@ -2,7 +2,7 @@ import pathlib, os, random, math, json, threading
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog
-from PIL import Image,ImageTk
+from PIL import Image,ImageTk,ImageGrab
 from sys import exit
 from All_class.class_dataset import Salles
 from All_class.class_optimization_random import Optimization_random
@@ -36,13 +36,40 @@ class Application():
         #Export menu
         self.export_menu = Menu(self.root_menu)
         self.root_menu.add_cascade(label="Export", menu=self.export_menu)
-        self.export_menu.add_command(label="Export the room as .png", command=None)
-        self.export_menu.add_command(label="Export the results as .txt", command=None)
+        self.export_menu.add_command(label="Export the results as .txt", command=self.export_results)
         #Help menu
         self.help_menu = Menu(self.root_menu)
         self.root_menu.add_cascade(label="Help", menu=self.help_menu)
-        self.help_menu.add_command(label="About", command=None)
+        self.help_menu.add_command(label="About", command=self.about)
 
+    def export_results(self):
+        # try:
+        path_file= filedialog.asksaveasfilename(
+            defaultextension='.txt', filetypes=[("Txt files", '*.txt')],
+            initialdir=pathlib.Path(__file__).parent.parent / "Export_files",
+            title="Save As")
+        with open(path_file, 'w') as f:
+            f.write(f"num\torient\tpos_x\tpos_y\tuse\n")
+            for chair in self.chairs:
+                line = f"{chair[0]}\t{chair[1]}\t{chair[2]}\t{chair[3]}\t{True if int(chair[4]) == 1 else False}\n"
+                f.write(line)
+            f.write(
+                f"\nUse chairs:\t{self.count_use}\t-> {round(100*(float(self.count_use)/float(self.count_total)),2)}%\n"
+                f"Unused chairs:\t{self.count_notuse}\t-> {round(100*(float(self.count_notuse)/float(self.count_total)),2)}%\n"
+                f"Total chairs:\t{self.count_total}\t-> {100.00}%\n")
+
+    def about(self):
+        root_about = Tk()
+        root_about.title("About")
+        root_about.iconbitmap(pathlib.Path(__file__).parents[1] / "Font_graphics/about.ico")
+        root_about_width,root_about_height = 200,200
+        root_about_posx,root_about_posy = 20,20
+        root_about.geometry(f"{root_about_width}x{root_about_height}+{root_about_posx}+{root_about_posy}")
+        root_about.resizable(False,False)
+        about_text = Label(root_about, text=
+            "Build by:\n\tEmanuel Senay-Lussier\n\tOlivier Simard-Hanley\n\tMahnaz Golshan", anchor="nw")
+        about_text.pack(fill="both")
+        root_about.mainloop()
     def gui(self):
         #Parameters of the gui_build
         self.gui_build = {
