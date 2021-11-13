@@ -197,25 +197,22 @@ class Application():
             filetypes=[('txt files', '.txt')]
             )
         file_name = os.path.basename(os.path.normpath(file_path))
-        try:
-            self.gui_settings["Data_path"] = file_path
-            self.gui_settings["Data_name"] = file_name
-            self.label_data_actual.configure(text=self.gui_settings["Data_name"])
-            
-            self.data = Salles(app=True)
-            self.room, self.chairs = self.data.chairs_list(self.gui_settings["Data_path"])
-
-            #Draw all the chairs as empty (before)
-            self.draw_graph()
-            self.draw_chairs("before")
-            #Activate the scales and the button
-            self.scale_iteration.configure(state=NORMAL)
-            self.scale_maximum_time.configure(state=NORMAL)
-            self.scale_distance.configure(state=NORMAL)
-            self.button_optimisation.configure(state=NORMAL)
-        except:
-            print("Fichier non valide")
-
+        # try:
+        self.gui_settings["Data_path"] = file_path
+        self.gui_settings["Data_name"] = file_name
+        self.label_data_actual.configure(text=self.gui_settings["Data_name"])
+        self.data = Salles(app=True)
+        self.room, self.chairs = self.data.chairs_list(self.gui_settings["Data_path"])
+        #Draw all the chairs as empty (before)
+        self.draw_graph()
+        self.draw_chairs("before")
+        #Activate the scales and the button
+        self.scale_iteration.configure(state=NORMAL)
+        self.scale_maximum_time.configure(state=NORMAL)
+        self.scale_distance.configure(state=NORMAL)
+        self.button_optimisation.configure(state=NORMAL)
+        # except:
+        #     print("Fichier non valide")
     def optimization(self):
         #save settings
         if self.combobox_algorithm.get() != "Choose an algorithm":
@@ -231,14 +228,17 @@ class Application():
         self.label_maximum_time_actual.configure(text=self.gui_settings["Time"])
         self.label_distance_actual.configure(text=self.gui_settings["Distance"])
         for chair in range(0,len(self.chairs)):
-            self.chairs[chair][4] = bool(False)
+            print("opti",chair,self.chairs[chair],self.chairs[chair][4])
+            self.chairs[chair][4] = bool(0)
+        print("done")
+        print(self.chairs)
         #optimisation
         if self.label_algorithm_actual.cget("text") == "Voisins exclus":
             opti = Voisins_exclus(self.chairs,
                 float(self.gui_settings["Distance"]),
                 int(self.gui_settings["Iterations"]),
                 int(self.gui_settings["Time"]))
-            self.chairs = opti.optimize()
+            self.chairs, self.duree = opti.optimize()
         elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
             opti = Optimization_des_sections(self.chairs,
                 float(self.gui_settings["Distance"]),
@@ -280,7 +280,7 @@ class Application():
         desk_red = (Image.open(f"{path}desk_red.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
         desk_yellow = (Image.open(f"{path}desk_yellow.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
         
-        for each in [["south",0],["est",90],["north",180],["west",270]]:
+        for each in [["south",0],["east",90],["north",180],["west",270]]:
             self.desk_brown_rot = ImageTk.PhotoImage(desk_brown.rotate(each[1]))
             self.desk_green_rot = ImageTk.PhotoImage(desk_green.rotate(each[1]))
             self.desk_red_rot = ImageTk.PhotoImage(desk_red.rotate(each[1]))
