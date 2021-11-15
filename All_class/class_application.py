@@ -151,13 +151,19 @@ class Application():
         self.scale_distance = Scale(self.frame_settings, from_=0.1, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var,state=DISABLED)
         self.scale_distance.grid(row=9, column=1,pady=(0,10))
 
-        #Settings - Show distance zone
+        #Settings - Show Radius button
         self.show_radius = BooleanVar()
         self.show_radius.set(False)
 
-        #Settings - Optimization button
-        self.button_show_radius = Checkbutton(self.frame_settings,text="Display the distance areas", width = 35,command=self.circle, variable = self.show_radius,state=DISABLED)
-        self.button_show_radius.grid(row=10, column=0, columnspan=2,pady=(0,10))
+        self.button_show_radius = Checkbutton(self.frame_settings,text="Display the radius", width = 17,command=self.radius_group, variable = self.show_radius,state=DISABLED)
+        self.button_show_radius.grid(row=10, column=0, columnspan=1,pady=(0,10))
+
+        #Settings - Show groups
+        self.show_groups = BooleanVar()
+        self.show_groups.set(False)
+
+        self.button_show_groups = Checkbutton(self.frame_settings,text="Display the groups", width = 17,command=self.radius_group, variable = self.show_groups,state=DISABLED)
+        self.button_show_groups.grid(row=10, column=1, columnspan=1,pady=(0,10))
     
 
     def draw_graph(self):
@@ -228,16 +234,15 @@ class Application():
         self.label_maximum_time_actual.configure(text=self.gui_settings["Time"])
         self.label_distance_actual.configure(text=self.gui_settings["Distance"])
         for chair in range(0,len(self.chairs)):
-            print("opti",chair,self.chairs[chair],self.chairs[chair][4])
             self.chairs[chair][4] = bool(0)
-        print("done")
-        print(self.chairs)
         #optimisation
         if self.label_algorithm_actual.cget("text") == "Voisins exclus":
             opti = Voisins_exclus(self.chairs,
                 float(self.gui_settings["Distance"]),
                 int(self.gui_settings["Iterations"]),
-                int(self.gui_settings["Time"]))
+                int(self.gui_settings["Time"]),
+                int(1), #methode
+                int(1)) #division
             self.chairs, self.duree = opti.optimize()
         elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
             opti = Optimization_des_sections(self.chairs,
@@ -247,16 +252,16 @@ class Application():
         self.draw_graph()
         self.draw_chairs("after")
         self.button_show_radius.configure(state=NORMAL)
+        self.button_show_groups.configure(state=NORMAL)
         self.status_bar.configure(text="Optimization done        ")
-    def circle(self):
-        #circle = distance radius
-        wantcircle = self.show_radius.get()
-        if wantcircle == True:
-            self.draw_chairs(state="after",circle=True)
-        else:
-            self.draw_chairs(state="after",circle=False)
+    def radius_group(self):
+        radius = self.show_radius.get()
+        groups = self.show_groups.get()
+        self.draw_chairs(state="after",radius=radius,groups=groups)
 
-    def draw_chairs(self,state,circle=False):  
+    def draw_chairs(self,state,radius=False,groups=False):
+        list_color =    ["#2acaea","#bada55","#ff0000","#ffd700","#ff80ed","#407294","#065535","#5ac18e","#f7347a","#ffc0cb",
+                        "#ffa500","#8a2be2","#0000ff","#800000","#c39797","#00ff00","#afeeee","#808080","#000000","#daa520"]
         #Scale the room to fit all the desk proportionally
         #If the size of width of the room is the dominant size (if the width fit, the heigher will fit)
         if self.room["width"] >= (7/6)*self.room["height"]:
@@ -304,8 +309,12 @@ class Application():
             elif state == "after":
                 if chair[4] == True:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["green"])
-                    if circle == True: #64 pixel = 75 cm --> donc distance (m) * 85.33 = nb pixel
-                        radius = int(self.label_distance_actual.cget("text"))*scale
-                        self.canvas_chairs.create_oval((pos_x - radius),(pos_y - radius),(pos_x + radius),(pos_y + radius),width=2,outline="#00ff0d")
+                    if radius == True: #64 pixel = 75 cm --> donc distance (m) * 85.33 = nb pixel
+                        circle_radius = int(self.label_distance_actual.cget("text"))*scale
+                        self.canvas_chairs.create_oval((pos_x - circle_radius),(pos_y - circle_radius),(pos_x + circle_radius),(pos_y + circle_radius),width=2,outline="#00ff0d")
                 else:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["brown"])
+                if groups == True:
+                    side = int(new_desk_size/2)
+                    self.canvas_chairs.create_rectangle((pos_x - side),(pos_y - side),(pos_x + side),(pos_y + side),width=2,outline=list_color[int(chair[5])])
+                
