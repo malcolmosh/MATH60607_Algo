@@ -74,7 +74,9 @@ class Voisins_exclus:
                                     L.append(j)
                     f=f+1 
                     
-            data = data_dataframe.values.tolist()            
+            data = data_dataframe.values.tolist()
+            #test!!!!
+            test_export = data            
 
         #conversion en array
         data=np.array(data)
@@ -88,8 +90,8 @@ class Voisins_exclus:
         #boucle pour chaque groupe
         for i in nombre_groupes: 
             
-            resultat_iterations=[] #tableau d'occupation des chaises de l'itération j
-            somme_iterations=[] #nombre de chaises itération j
+            resultat_iterations=[] #tableau d'occupation des chaises du groupe i
+            somme_iterations=[] #nombre de chaises du groupe i
 
             for j in range(self.iterations): 
                                 
@@ -162,7 +164,10 @@ class Voisins_exclus:
             
             
         # retenir meilleur résultat    
+        #concatener tous les meilleurs résultat ensemble
         exclus_final = np.concatenate(meilleurs_groupes)
+        #trier par numéro de chaise en ordre croissant
+        exclus_final = exclus_final[exclus_final[:, 0].argsort()]
         capacite_optimale = exclus_final[:,3].sum()
         array_final=np.zeros((len(data),5)) #créer array rempli de 0 avec 5 colonnes
         array_final[:,0:4]=exclus_final #ajouter le choix final des chaises à ce nouvel array, array_final
@@ -184,6 +189,9 @@ class Voisins_exclus:
         self.capacite_optimale = capacite_optimale
         self.interrompu = interrompu
         self.potential_end = potential_end*60
+        
+        ###test
+        self.test_export = test_export
         
         #sortie finale : on retourne le meilleur tableau et le temps écoulé
         liste_finale = []
