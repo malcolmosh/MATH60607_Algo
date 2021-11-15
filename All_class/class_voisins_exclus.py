@@ -241,8 +241,9 @@ class Voisins_exclus:
             tableau = self.tableau_optimal
             x_cord = [row[2] for row in tableau]
             y_cord = [row[3] for row in tableau]
-            groups = pd.Categorical([row[4] for row in tableau], categories=[0,1], ordered=True)
-            graphe = px.scatter(x=x_cord,y=y_cord,color=groups, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
+            occup = pd.Categorical([row[4] for row in tableau], categories=[0,1], ordered=True)
+            groups = pd.Categorical([row[5] for row in tableau], ordered=True)
+            graphe = px.scatter(x=x_cord,y=y_cord,color=groups, symbol = occup, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
             graphe.show()   
 
        
