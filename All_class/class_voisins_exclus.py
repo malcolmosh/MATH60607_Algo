@@ -36,19 +36,15 @@ class Voisins_exclus:
     
     #rouler l'algorithme
     def optimize(self):    
-        data=(self.data) #fichier donnees en entree
-        donnees=data.copy()
-        
+        donnees=(self.data) #fichier donnees en entree
+       
         #vérifier l'heure
         start=time.time()
 
-        #liste vide pour entreposer les orientations
-        orientations = [] 
-        
-        # retirer la colonne des points cardinaux du fichier de données
-        for row in donnees: 
-            orientations.append(row[1]) #ajouter le point cardinal à la liste
-            del row[1] 
+        # entreposer les orientations
+        orientations = [row[1] for row in donnees]
+        # retirer la colonne des points cardinaux du fichier de données   
+        donnees = [(row[0], row[2], row[3], row[4]) for row in donnees]
         
         #si on ne divise pas la classe
         if self.division==0: 
@@ -197,7 +193,7 @@ class Voisins_exclus:
         self.capacite_optimale = capacite_optimale
         self.interrompu = interrompu
         self.potential_end = potential_end*60
-        
+       
         
         #sortie finale : on retourne le meilleur tableau et le temps écoulé
         liste_finale = []
