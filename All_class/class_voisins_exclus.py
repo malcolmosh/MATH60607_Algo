@@ -37,7 +37,8 @@ class Voisins_exclus:
     #rouler l'algorithme
     def optimize(self):    
         data=(self.data) #fichier donnees en entree
-       
+        donnees=data.copy()
+        
         #vérifier l'heure
         start=time.time()
 
@@ -45,16 +46,16 @@ class Voisins_exclus:
         orientations = [] 
         
         # retirer la colonne des points cardinaux du fichier de données
-        for row in data: 
+        for row in donnees: 
             orientations.append(row[1]) #ajouter le point cardinal à la liste
             del row[1] 
         
         #si on ne divise pas la classe
         if self.division==0: 
-            data = [row+[1] for row in data] #toutes les chaises sont dans le même groupe
+            donnees = [row+[1] for row in donnees] #toutes les chaises sont dans le même groupe
         #sinon on divise la classe en section
         else:
-            data_dataframe = pd.DataFrame(data,columns=("num","pos_x","pos_y","use"))
+            data_dataframe = pd.DataFrame(donnees,columns=("num","pos_x","pos_y","use"))
             data_dataframe.loc[:,'group']=0
             data_dataframe.loc[:,'use']=0
             
@@ -74,15 +75,13 @@ class Voisins_exclus:
                                     L.append(j)
                     f=f+1 
                     
-            data = data_dataframe.values.tolist()
-            #test!!!!
-            test_export = data            
+            donnees = data_dataframe.values.tolist()
 
         #conversion en array
-        data=np.array(data)
+        donnees=np.array(donnees)
          
         #nombre de groupes
-        nombre_groupes = set(data[:,4].tolist()) 
+        nombre_groupes = set(donnees[:,4].tolist()) 
             
         #liste pour la meilleure configuration de chaque groupe
         meilleurs_groupes=[] 
@@ -95,7 +94,7 @@ class Voisins_exclus:
 
             for j in range(self.iterations): 
                                 
-                subset = data[np.where(data[:,4] ==i)]
+                subset = donnees[np.where(donnees[:,4] ==i)]
                 chaises=subset[:,0:4].copy() #initialiser array chaises 
                 exclus=np.zeros((len(chaises),4)) #initialiser liste vide exclus
             
@@ -111,19 +110,28 @@ class Voisins_exclus:
                         #methode == 3 : plus loin voisin
                         #methode ==4 : weighed random avec pourcentage 
                     if self.methode==2 and while_index>0:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
-                        #trouver plus proche voisin
+                        #trouver plus proche voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
                         dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, au hasard)
                         index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
                         prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
              
-                    elif self.methode==3 and while_index>0:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
-                        #trouver plus proche voisin
+                    elif self.methode==3 and while_index>0:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
+                        #trouver plus loin voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
                         dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, au hasard)
                         index = dist_eucl.tolist().index(dist_loin_voisin) #index de cette chaise dans la liste des distances euclidiennes
                         prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
             
+                    elif self.methode==4 and while_index>0:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
+                        #trouver prochain voisin admissible avec une probabilité pondérée 
+                        voisins = dist_eucl[(dist_eucl>2)] # retenir toutes les chaises à plus de 2m
+                        dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, au hasard)
+                        ratios =(1-(voisins/dist_loin_voisin))/(sum(1-(voisins/dist_loin_voisin)))
+                        choix = random.choices(voisins, weights=ratios, k=1)[0]
+                        index = dist_eucl.tolist().index(choix) #index de cette chaise dans la liste des distances euclidiennes
+                        prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
+
                     else: #méthode==1
                         prochaine_chaise = random.choice(chaises[en_jeu]) #choisir chaise au hasard parmi celles en jeu
                     
@@ -169,9 +177,9 @@ class Voisins_exclus:
         #trier par numéro de chaise en ordre croissant
         exclus_final = exclus_final[exclus_final[:, 0].argsort()]
         capacite_optimale = exclus_final[:,3].sum()
-        array_final=np.zeros((len(data),5)) #créer array rempli de 0 avec 5 colonnes
+        array_final=np.zeros((len(donnees),5)) #créer array rempli de 0 avec 5 colonnes
         array_final[:,0:4]=exclus_final #ajouter le choix final des chaises à ce nouvel array, array_final
-        array_final[:,4]=data[:,4] #ajouter le numéro de groupe en dernière colonne de l'array final
+        array_final[:,4]=donnees[:,4] #ajouter le numéro de groupe en dernière colonne de l'array final
 
         meilleur_tableau = array_final.tolist() #convertir en liste
         
@@ -190,8 +198,6 @@ class Voisins_exclus:
         self.interrompu = interrompu
         self.potential_end = potential_end*60
         
-        ###test
-        self.test_export = test_export
         
         #sortie finale : on retourne le meilleur tableau et le temps écoulé
         liste_finale = []
