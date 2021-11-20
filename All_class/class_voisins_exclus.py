@@ -44,7 +44,7 @@ class Voisins_exclus:
         # entreposer les orientations
         orientations = [row[1] for row in donnees]
         # retirer la colonne des points cardinaux du fichier de données   
-        donnees = [(row[0], row[2], row[3], row[4]) for row in donnees]
+        donnees = [[row[0], row[2], row[3], row[4]] for row in donnees]
         
         #si on ne divise pas la classe
         if self.division==0: 
@@ -81,7 +81,14 @@ class Voisins_exclus:
             
         #liste pour la meilleure configuration de chaque groupe
         meilleurs_groupes=[] 
-            
+        
+        #entreposer tous les groupes
+        tous_groupes=[]
+        
+        #liste pour entrepose le numero de groupe, le nombre de chaises et l'index de l'itération avec le meilleur résultat
+        #cette liste sert à évaluer la performance de la méthode choisie
+        tableau_perfo=[]
+        
         #boucle pour chaque groupe
         for i in nombre_groupes: 
             
@@ -105,28 +112,43 @@ class Voisins_exclus:
                         #methode == 2 : plus proche voisin
                         #methode == 3 : plus loin voisin
                         #methode ==4 : weighed random avec pourcentage 
-                    if self.methode==2 and while_index>0:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
+                    if self.methode==2 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
                         #trouver plus proche voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
-                        dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, au hasard)
-                        index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
-                        prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
+ 
+                        if (min(voisins)==max(voisins)): #si aucun voisin, si 1 seul voisin,si voisins sont à la même distance
+                            prochaine_chaise = random.choice(chaises[en_jeu])
+
+                        else:                  
+                            dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, au hasard)
+                            index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
+                            prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
              
-                    elif self.methode==3 and while_index>0:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
+                    elif self.methode==3 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
                         #trouver plus loin voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
-                        dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, au hasard)
-                        index = dist_eucl.tolist().index(dist_loin_voisin) #index de cette chaise dans la liste des distances euclidiennes
-                        prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
+
+                        if (min(voisins)==max(voisins)): #si aucun voisin, si 1 seul voisin,si voisins sont à la même distance
+                            prochaine_chaise = random.choice(chaises[en_jeu])
+
+                        else:
+                            dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, le premier)
+                            index = dist_eucl.tolist().index(dist_loin_voisin) #index de cette chaise dans la liste des distances euclidiennes
+                            prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
             
-                    elif self.methode==4 and while_index>0:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
+                    elif self.methode==4 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
                         #trouver prochain voisin admissible avec une probabilité pondérée 
-                        voisins = dist_eucl[(dist_eucl>2)] # retenir toutes les chaises à plus de 2m
-                        dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, au hasard)
-                        ratios =(1-(voisins/dist_loin_voisin))/(sum(1-(voisins/dist_loin_voisin)))
-                        choix = random.choices(voisins, weights=ratios, k=1)[0]
-                        index = dist_eucl.tolist().index(choix) #index de cette chaise dans la liste des distances euclidiennes
-                        prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
+                        voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
+
+                        if (min(voisins)==max(voisins)): #or voisins.size==1 or: #si aucun voisin, si 1 seul voisin,si voisins sont à la même distance
+                            prochaine_chaise = random.choice(chaises[en_jeu])
+
+                        else:
+                            dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, le premier)
+                            ratios =(1-(voisins/dist_loin_voisin))/(sum(1-(voisins/dist_loin_voisin)))
+                            choix = random.choices(voisins, weights=ratios, k=1)[0]
+                            index = dist_eucl.tolist().index(choix) #index de cette chaise dans la liste des distances euclidiennes
+                            prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
 
                     else: #méthode==1
                         prochaine_chaise = random.choice(chaises[en_jeu]) #choisir chaise au hasard parmi celles en jeu
@@ -149,6 +171,7 @@ class Voisins_exclus:
         
                 resultat_iterations.append(exclus)
                 somme_iterations.append(exclus[:,3].sum())
+                tous_groupes.append([i,j,exclus[:,3].sum()])
 
                 #early stopping with time
                 time_now = time.time() #moment de fin de l'itération 
@@ -161,11 +184,13 @@ class Voisins_exclus:
                 else:
                     interrompu=0
 
+
             capacite_opt_groupe=max(somme_iterations) #capacité optimale trouvée pour ce groupe
             index_best=somme_iterations.index(capacite_opt_groupe) #index meilleure somme
             meilleur_subset=resultat_iterations[index_best] #retenir tableau meilleur subset
             meilleurs_groupes.append(meilleur_subset) #ajouter le tableau de ce groupe à la liste 
-            
+            nombre_chaises = len(meilleur_subset)
+            tableau_perfo.append([i,nombre_chaises, index_best])
             
         # retenir meilleur résultat    
         #concatener tous les meilleurs résultat ensemble
@@ -193,14 +218,15 @@ class Voisins_exclus:
         self.capacite_optimale = capacite_optimale
         self.interrompu = interrompu
         self.potential_end = potential_end*60
+        self.tableau_perfo = pd.DataFrame(tableau_perfo, columns=['Num_groupe','Nombre chaises','Iteration_best'])
+        self.tous_groupes = tous_groupes
        
         
         #sortie finale : on retourne le meilleur tableau et le temps écoulé
         liste_finale = []
         liste_finale.append(self.tableau_optimal)
         liste_finale.append(self.total_time)
-        for each in liste_finale[0]:
-            print(each)
+
         return liste_finale
     
     #imprimer le résultat de la meilleure itération
