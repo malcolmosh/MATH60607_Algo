@@ -82,7 +82,7 @@ class Voisins_exclus:
         #liste pour la meilleure configuration de chaque groupe
         meilleurs_groupes=[] 
         
-        #entreposer tous les groupes
+        #entreposer toutes les configurations de chaque itération pour tous les groupes
         tous_groupes=[]
         
         #liste pour entrepose le numero de groupe, le nombre de chaises et l'index de l'itération avec le meilleur résultat
@@ -111,7 +111,8 @@ class Voisins_exclus:
                         #methode == 1 : au hasard
                         #methode == 2 : plus proche voisin
                         #methode == 3 : plus loin voisin
-                        #methode ==4 : weighed random avec pourcentage 
+                        #methode ==4 : weighed random avec pourcentage
+                        
                     if self.methode==2 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
                         #trouver plus proche voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
@@ -128,7 +129,7 @@ class Voisins_exclus:
                         #trouver plus loin voisin admissible
                         voisins = dist_eucl[(dist_eucl>self.distance)] # retenir toutes les chaises à plus de 2m
 
-                        if (min(voisins)==max(voisins)): #si aucun voisin, si 1 seul voisin,si voisins sont à la même distance
+                        if voisins.size==0 or (min(voisins)==max(voisins)): #si aucun voisin, si 1 seul voisin,si voisins sont à la même distance
                             prochaine_chaise = random.choice(chaises[en_jeu])
 
                         else:
@@ -169,9 +170,12 @@ class Voisins_exclus:
             
                     while_index+=1
         
+                #ajouter la configuration des chaises de cette itération
                 resultat_iterations.append(exclus)
+                #ajouter la somme des chaises occupées
                 somme_iterations.append(exclus[:,3].sum())
-                tous_groupes.append([i,j,exclus[:,3].sum()])
+                #ajouter le # de groupe, le # de l'itération et la somme des chaises occupées
+                tous_groupes.append([i,j,exclus[:,3].sum(),self.methode])
 
                 #early stopping with time
                 time_now = time.time() #moment de fin de l'itération 
