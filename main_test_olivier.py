@@ -31,25 +31,25 @@ optimize1.graphe_sortie()
 optimize1.temps()
 
 #examiner performance
-methode_list=[]
-for i, value in enumerate(["Voisin aléatoire","Plus proche voisin","Plus loin voisin","Plus proche voisin pondéré"]):
-    iter_list=[]
-    for epoch in range(1):
-        optimize1=Voisins_exclus(salle_classe,1.25,100,methode=i+1, division=1)
-        tableau, temps = optimize1.optimize()
-        nombre_chaises=sum([row[4] for row in tableau])
-        tableau_perfo = optimize1.tableau_perfo
-        tableau_perfo['iter']=epoch
-        tableau_perfo['capacite']=nombre_chaises
-        iter_list.append(tableau_perfo)
+# methode_list=[]
+# for i, value in enumerate(["Voisin aléatoire","Plus proche voisin","Plus loin voisin","Plus proche voisin pondéré"]):
+#     iter_list=[]
+#     for epoch in range(1):
+#         optimize1=Voisins_exclus(salle_classe,1.25,100,methode=i+1, division=1)
+#         tableau, temps = optimize1.optimize()
+#         nombre_chaises=sum([row[4] for row in tableau])
+#         tableau_perfo = optimize1.tableau_perfo
+#         tableau_perfo['iter']=epoch
+#         tableau_perfo['capacite']=nombre_chaises
+#         iter_list.append(tableau_perfo)
         
-    tableau_concat = pd.concat(iter_list)
-    tableau_methode = pd.DataFrame(tableau_concat.groupby('Num_groupe')[['Iteration_best','capacite']].mean())
-    tableau_methode['methode']=value
-    methode_list.append(tableau_methode)
+#     tableau_concat = pd.concat(iter_list)
+#     tableau_methode = pd.DataFrame(tableau_concat.groupby('Num_groupe')[['Iteration_best','capacite']].mean())
+#     tableau_methode['methode']=value
+#     methode_list.append(tableau_methode)
     
-tableau_comp = pd.concat(methode_list)
-print(tableau_comp)
+# tableau_comp = pd.concat(methode_list)
+# print(tableau_comp)
 
 
 #creer salle classe grand carré (500 places)
@@ -112,3 +112,6 @@ graphe.layout.yaxis6.matches = 'y5'
 graphe.layout.yaxis7.matches = 'y5'
 graphe.layout.yaxis8.matches = 'y5'
 graphe.show()   
+
+
+#tester avec manuvie, avec grande salle rectangulaire, avec grande salle qui a des division
