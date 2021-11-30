@@ -17,7 +17,7 @@ class Application():
         self.root.title("Optimisation de chaises App")
         self.root.iconbitmap(pathlib.Path(__file__).parents[1] / "Font_graphics/icon.ico")
         self.root_width,self.root_height = 1230,640
-        self.root_posx,self.root_posy = 20,20
+        self.root_posx,self.root_posy = 5,5
         self.root.geometry(f"{self.root_width}x{self.root_height}+{self.root_posx}+{self.root_posy}")
         self.root.resizable(False,False)
         
