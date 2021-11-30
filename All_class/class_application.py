@@ -20,13 +20,9 @@ class Application():
         self.root_posx,self.root_posy = 20,20
         self.root.geometry(f"{self.root_width}x{self.root_height}+{self.root_posx}+{self.root_posy}")
         self.root.resizable(False,False)
-        self.list_color = [
-            "#0000FF","#FF0000","#FFFF00","#00FFFF","#FFA500","#8A2BE2","#006400","#FF1493","#FFE4C4","#8B0000",
-            "#FFD700","#FF00FF","#7FFFD4","#000000","#6495ED","#008B8B","#00008B","#DAA520","#808080","#9400D3",
-            "#FF7F50","#F08080","#228B22","#FFFACD","#ADD8E6","#20B2AA","#FFC0CB","#F0FFFF","#A0522D","#9ACD32"]
         
         #Function menu and gui to set up the menu bar and the gui interface
-        self.menu()
+        #self.menu()
         self.gui()
         self.root.mainloop()
     def menu(self):
@@ -77,20 +73,20 @@ class Application():
         about_text.pack(fill="both")
         root_about.mainloop()
     def gui(self):
-        #Parameters of the gui_build
+        #Dictionnary of the general settings of each sections of the GUI
         self.gui_build = {
-            "status_bar":{          "posx":0,  "posy":580,  "width":1230,    "height":20,   "color":"#ffffff"},
-            "frame_settings":{      "posx":10,  "posy":12,  "width":500,    "height":340,   "color":"#4A6572"},
-            "button_optimisation":{ "posx":12,  "posy":400, "width":70,     "height":1,     "color":"#F9AA33"}, #Pas le même système de width-height
-            "canvas_graph":{        "posx":10,  "posy":430, "width":500,    "height":150,   "color":"#4A6572"},
-            "canvas_chairs":{       "posx":520, "posy":10,  "width":700,    "height":570,   "color":"#4A6572"}}
+            "status_bar":{          "posx":0,  "posy":595,  "width":1230,    "height":20,   "color":"#ffffff"},
+            "frame_settings":{      "posx":5,  "posy":5,  "width":500,    "height":300,   "color":"#4A6572"},
+            "frame_buttons":{       "posx":5,  "posy":252, "width":500,     "height":50,     "color":"#F9AA33"}, #Pas le même système de width-height
+            "canvas_graph":{        "posx":5,  "posy":332, "width":503,    "height":258,   "color":"#4A6572"},
+            "canvas_chairs":{       "posx":510, "posy":3,  "width":710,    "height":587,   "color":"#4A6572"}}
 
 
-        #Set up the 5 gui sectors
+        #Set up the 5 GUI sections
         self.frame_settings = Frame(self.root,width=self.gui_build["frame_settings"]["width"],height=self.gui_build["frame_settings"]["height"],bg=self.gui_build["frame_settings"]["color"])
         self.frame_settings.place(x=self.gui_build["frame_settings"]["posx"], y=self.gui_build["frame_settings"]["posy"])
-        self.button_optimisation = Button(self.root,text="Optimize the room!",width=self.gui_build["button_optimisation"]["width"],height=self.gui_build["button_optimisation"]["height"],command=self.optimization,bg=self.gui_build["button_optimisation"]["color"],state=DISABLED)
-        self.button_optimisation.place(x=self.gui_build["button_optimisation"]["posx"], y=self.gui_build["button_optimisation"]["posy"])
+        self.frame_buttons = Frame(self.root,width=self.gui_build["frame_buttons"]["width"],height=self.gui_build["frame_buttons"]["height"],bg=self.gui_build["frame_buttons"]["color"])
+        self.frame_buttons.place(x=self.gui_build["frame_buttons"]["posx"], y=self.gui_build["frame_buttons"]["posy"])
         self.canvas_graph = Canvas(self.root,width=self.gui_build["canvas_graph"]["width"],height=self.gui_build["canvas_graph"]["height"],bg=self.gui_build["canvas_graph"]["color"])
         self.canvas_graph.place(x=self.gui_build["canvas_graph"]["posx"], y=self.gui_build["canvas_graph"]["posy"])
         self.canvas_chairs = Canvas(self.root,width=self.gui_build["canvas_chairs"]["width"],height=self.gui_build["canvas_chairs"]["height"],bg=self.gui_build["canvas_chairs"]["color"])
@@ -98,83 +94,88 @@ class Application():
         self.status_bar = Label(self.root, text="Choose your settings        ", anchor="e")
         self.status_bar.place(x=self.gui_build["status_bar"]["posx"], y=self.gui_build["status_bar"]["posy"],width=self.gui_build["status_bar"]["width"],height=self.gui_build["status_bar"]["height"])
 
+        #Dictionnary of the actual settings chose by the user
         self.gui_settings = {
                 "Data_name":"",
                 "Data_path":"",
                 "Algorithm":"",
                 "Iterations":100,
                 "Time":10,
-                "Distance":2}
+                "Distance":2.0}
 
         #Settings - Settings
         self.label_data = Label(self.frame_settings, text="Settings",width=45,bg="#4A6572",fg="#ffffff",font=20)
-        self.label_data.grid(row=0,column=0,columnspan=2)
+        self.label_data.grid(row=0,column=0,columnspan=3)
         
         #Settings - Data
-        self.label_data = Label(self.frame_settings, text="Data",anchor="w",bg="#4A6572",fg="#ffffff")
-        self.label_data.grid(row=1,column=0, sticky="w", padx=(10,0))
-        self.label_data_actual = Label(self.frame_settings,text=self.gui_settings["Data_name"],anchor="w",bg="#ffffff")
-        self.label_data_actual.grid(row=1,column=1, sticky="w")
-        self.button_data = Button(self.frame_settings, text="Choose a data set",command=self.pick_file, fg="#000000")
-        self.button_data.grid(row=2, column=0, columnspan=2,pady=(0,10), sticky="w")
+        self.label_data = Label(self.frame_settings, text="Data",anchor="w",bg="#4A6572",fg="#ffffff", width=10)
+        self.label_data_actual = Label(self.frame_settings,text=self.gui_settings["Data_name"],anchor="w",bg="#4A6572",fg="#ffffff",width=20)
+        self.button_data = Button(self.frame_settings, text="Choose a data set",command=self.pick_file, fg="#000000",width=25, height=1)
+
+        self.label_data.grid(       row=1,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.label_data_actual.grid(row=1,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.button_data.grid(      row=1,  column=2,   columnspan=1, sticky="e",   padx=(0,10),    pady=(10,10))
 
         #Settings - Algorithm
         #List of the available algorithm
-        self.algorithm_list = ["Voisins exclus", "Optimization_des_sections"]
-        self.label_algorithm = Label(self.frame_settings, text="Algorithm",width=20,height=1,anchor="w")
-        self.label_algorithm.grid(row=3,column=0)
-        self.label_algorithm_actual = Label(self.frame_settings,text=self.gui_settings["Algorithm"],width=21,height=1,anchor="w",bg="#ffffff")
-        self.label_algorithm_actual.grid(row=3,column=1)
-        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly", width=41)
+        self.algorithm_list = ["Voisins exclus"]
+        self.label_algorithm = Label(self.frame_settings, text="Algorithm",anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_algorithm_actual = Label(self.frame_settings,text=self.gui_settings["Algorithm"],anchor="w",bg="#4A6572",fg="#ffffff")
+        self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly",width=27, height=1)
         self.combobox_algorithm.set("Choose an algorithm")
-        self.combobox_algorithm.grid(row=4, column=0,columnspan=2,pady=(0,10))
+        self.combobox_algorithm.bind("<<ComboboxSelected>>",self.comboclick)
+        
+        self.label_algorithm.grid(          row=2,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.label_algorithm_actual.grid(   row=2,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.combobox_algorithm.grid(       row=2,  column=2,   columnspan=1, sticky="e",   padx=(0,10),    pady=(10,10))
 
         #Settings - Iteration
         self.iteration_var = IntVar(value=int(self.gui_settings["Iterations"]))
-        self.label_iteration = Label(self.frame_settings, text="Number of iterations",width=20,height=1,anchor="w")
-        self.label_iteration.grid(row=5,column=0)
-        self.label_iteration_actual = Label(self.frame_settings,text=str(self.gui_settings["Iterations"]),width=21,height=1,anchor="w",bg="#ffffff")
-        self.label_iteration_actual.grid(row=5,column=1)
-        self.label_scale_iteration = Label(self.frame_settings,width=10, textvariable=self.iteration_var)
-        self.label_scale_iteration.grid(row=6, column=0,pady=(0,10))
-        self.scale_iteration = Scale(self.frame_settings, from_=50, to=10000,resolution=50, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.iteration_var,state=DISABLED)
-        self.scale_iteration.grid(row=6, column=1,pady=(0,10))
+        self.label_iteration = Label(self.frame_settings, text="Number of iterations",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_scale_iteration_actual = Label(self.frame_settings,width=10, textvariable=self.iteration_var,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.scale_iteration = Scale(self.frame_settings, from_=50, to=10000,resolution=50, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.iteration_var,command=self.scale_iteration,state=DISABLED)
+        
+        self.label_iteration.grid(                  row=3,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.label_scale_iteration_actual.grid(     row=3,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
+        self.scale_iteration.grid(                  row=3,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
 
         #Settings - Maximum time
         self.maximum_time_var = IntVar(value=int(self.gui_settings["Time"]))
-        self.label_maximum_time = Label(self.frame_settings, text="Maximum time (minutes)",width=20,height=1,anchor="w")
-        self.label_maximum_time.grid(row=7,column=0)
-        self.label_maximum_time_actual = Label(self.frame_settings,text=str(self.gui_settings["Time"]),width=21,height=1,anchor="w",bg="#ffffff")
-        self.label_maximum_time_actual.grid(row=7,column=1)
-        self.label_maximum_time = Label(self.frame_settings,width=10, textvariable=self.maximum_time_var)
-        self.label_maximum_time.grid(row=8, column=0,pady=(0,10))
-        self.scale_maximum_time = Scale(self.frame_settings, from_=5, to=120,resolution=5, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.maximum_time_var, state=DISABLED)
-        self.scale_maximum_time.grid(row=8, column=1,pady=(0,10))
+        self.label_maximum_time = Label(self.frame_settings, text="Maximum time (minutes)",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_maximum_time_actual = Label(self.frame_settings,width=10,textvariable=self.maximum_time_var,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.scale_maximum_time = Scale(self.frame_settings, from_=5, to=120,resolution=5, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.maximum_time_var,command=self.scale_time, state=DISABLED)
+        
+        self.label_maximum_time.grid(       row=4,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
+        self.label_maximum_time_actual.grid(row=4,  column=1,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
+        self.scale_maximum_time.grid(       row=4,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
 
         #Settings - Distance
         self.distance_var = DoubleVar(value=float(self.gui_settings["Distance"]))
-        self.label_distance = Label(self.frame_settings, text="Distancing (meters)",width=20,height=1,anchor="w")
-        self.label_distance.grid(row=9,column=0)
-        self.label_distance_actual = Label(self.frame_settings,text=str(self.gui_settings["Distance"]),width=21,height=1,anchor="w",bg="#ffffff")
-        self.label_distance_actual.grid(row=9,column=1)
-        self.label_distance = Label(self.frame_settings,width=10, textvariable=self.distance_var)
-        self.label_distance.grid(row=10, column=0,pady=(0,10))
-        self.scale_distance = Scale(self.frame_settings, from_=0.1, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=147,showvalue=0, variable=self.distance_var,state=DISABLED)
-        self.scale_distance.grid(row=10, column=1,pady=(0,10))
+        self.label_distance = Label(self.frame_settings, text="Distance (meters)",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_distance_actual = Label(self.frame_settings,width=10,textvariable=self.distance_var,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.scale_distance = Scale(self.frame_settings, from_=0.1, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.distance_var,command=self.scale_distance, state=DISABLED)
+        
+        self.label_distance.grid(       row=5,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
+        self.label_distance_actual.grid(row=5,  column=1,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
+        self.scale_distance.grid(       row=5,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
 
+        #Button - Optimization
+        self.button_optimisation = Button(self.frame_buttons,text="Optimize the room!",command=self.optimization,bg="#F9AA33",state=DISABLED, width=41, height=3)
+        self.button_optimisation.grid(  row=0,  column=0,   columnspan=2,   rowspan=2,  sticky="w",   padx=(10,10),    pady=(10,10))
+        
         #Settings - Show Radius button
         self.show_radius = BooleanVar()
         self.show_radius.set(False)
 
-        self.button_show_radius = Checkbutton(self.frame_settings,text="Display the radius", width = 17,command=self.radius_group, variable = self.show_radius,state=DISABLED)
-        self.button_show_radius.grid(row=11, column=0, columnspan=1,pady=(0,10))
+        self.button_show_radius = Checkbutton(self.frame_buttons,text="Display the radius",command=self.radius_group, variable = self.show_radius,state=DISABLED, width=20, height=1) #self.show_radius
+        self.button_show_radius.grid(  row=0,  column=2,   columnspan=1, sticky="e",   padx=(10,10),    pady=(10,0))
 
         #Settings - Show groups
         self.show_groups = BooleanVar()
         self.show_groups.set(False)
 
-        self.button_show_groups = Checkbutton(self.frame_settings,text="Display the groups", width = 17,command=self.radius_group, variable = self.show_groups,state=DISABLED)
-        self.button_show_groups.grid(row=11, column=1, columnspan=1,pady=(0,10))
+        self.button_show_groups = Checkbutton(self.frame_buttons,text="Display the groups",command=self.radius_group, variable = self.show_groups,state=DISABLED, width=20, height=1) #self.radius_group
+        self.button_show_groups.grid(  row=1,  column=2,   columnspan=1, sticky="e",   padx=(10,10),    pady=(10,10))
     
 
     def draw_graph(self):
@@ -185,28 +186,51 @@ class Application():
             if each[4] == True: self.count_use += 1
             else: self.count_notuse += 1
         self.count_total = self.count_use + self.count_notuse
-        
+         #"width":503,    "height":258
         #Draw the new graph after deleting the old one
         self.canvas_graph.delete("all")
-        coordinates_arc = 20,20,130,130
-        coordinates_rect_use = 20,140,40,160
-        coordinates_rect_notuse = 20,170,40,190
-        coordinates_text_use = 50, 150
-        coordinates_text_notuse = 50, 180
-        coordinates_count_use = 180, 150
-        coordinates_count_notuse = 180, 180
+        coordinates_arc = 10,20,250,250
+        coordinates_rect_use = 260,90,290,120
+        coordinates_rect_notuse = 260,150,290,180
+        coordinates_text_use = 300,105
+        coordinates_text_notuse = 300,165
+        coordinates_count_use = 440,105
+        coordinates_count_notuse = 440,165
         use_end = 360*(float(self.count_use) / float(self.count_total))
         arc = self.canvas_graph.create_arc(coordinates_arc, start=0, extent=use_end, fill="green")
         arc = self.canvas_graph.create_arc(coordinates_arc, start=use_end, extent=(359.9999-use_end), fill="gray")
         rect = self.canvas_graph.create_rectangle(coordinates_rect_use,fill="green")
         rect = self.canvas_graph.create_rectangle(coordinates_rect_notuse, fill="gray")
-        text = self.canvas_graph.create_text(coordinates_text_use, text = "Used chairs", anchor="w")
-        text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Unused chairs", anchor="w")
-        text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w")
-        text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w")
+        text = self.canvas_graph.create_text(coordinates_text_use, text = "Used chairs", anchor="w",font=20)
+        text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Unused chairs", anchor="w",font=20)
+        text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w",font=20)
+        text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w",font=20)
+    def comboclick(self,event):
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        self.gui_settings["Algorithm"] = str(self.combobox_algorithm.get())
+        self.label_algorithm_actual.configure(text = self.gui_settings["Algorithm"])
+        self.combobox_algorithm.set("Choose an algorithm")
+
+    def scale_iteration(self,value):
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        self.gui_settings["Iterations"] = int(value)
+    
+    def scale_time(self,value):
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        self.gui_settings["Time"] = int(value)
+
+    def scale_distance(self,value):
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        self.gui_settings["Distance"] = float(value)
 
     def pick_file(self):
-
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        self.button_optimisation.configure(state=DISABLED)
         #Choose a data file in the browser
         file_path = filedialog.askopenfilename(
             parent=self.root, initialdir=pathlib.Path(__file__).parent.parent / "Data",
@@ -231,21 +255,10 @@ class Application():
         except:
             print("Fichier non valide")
     def optimization(self):
-        #save settings
-        if self.combobox_algorithm.get() != "Choose an algorithm":
-            self.gui_settings["Algorithm"] = self.combobox_algorithm.get()
-            self.label_algorithm_actual.configure(text=self.gui_settings["Algorithm"])
-            self.combobox_algorithm.set("Choose an algorithm")
-            self.combobox_algorithm.selection_clear()
-        
-        self.gui_settings["Iterations"] = self.scale_iteration.get()
-        self.gui_settings["Time"] = self.scale_maximum_time.get()
-        self.gui_settings["Distance"] = self.scale_distance.get()
-        self.label_iteration_actual.configure(text=self.gui_settings["Iterations"])
-        self.label_maximum_time_actual.configure(text=self.gui_settings["Time"])
-        self.label_distance_actual.configure(text=self.gui_settings["Distance"])
         for chair in range(0,len(self.chairs)):
             self.chairs[chair][4] = bool(0)
+            while len(self.chairs[chair])>=6:
+                self.chairs[chair].pop(-1)
         #optimisation
         if self.label_algorithm_actual.cget("text") == "Voisins exclus":
             opti = Voisins_exclus(self.chairs,
@@ -255,11 +268,6 @@ class Application():
                 int(1), #methode
                 int(1)) #division
             self.chairs, self.duree = opti.optimize()
-        elif self.label_algorithm_actual.cget("text") == "Optimization_des_sections":
-            opti = Optimization_des_sections(self.chairs,
-                float(self.gui_settings["Distance"]),
-                int(self.gui_settings["Time"]))
-            self.chairs, self.time_total = opti.optimize()
         self.draw_graph()
         self.draw_chairs("after")
         self.button_show_radius.configure(state=NORMAL)
@@ -272,19 +280,21 @@ class Application():
 
     def draw_chairs(self,state,radius=False,groups=False):
         #Scale the room to fit all the desk proportionally
+        width_height = self.gui_build["canvas_chairs"]["width"] / self.gui_build["canvas_chairs"]["height"]
+        canvas_chairs_meter_width = self.gui_build["canvas_chairs"]["width"] * (60/6400) #1 desk is 64x64 pixel and 60 cm in real transform in meter
+        canvas_chairs_meter_height = self.gui_build["canvas_chairs"]["height"] * (60/6400)
         #If the size of width of the room is the dominant size (if the width fit, the heigher will fit)
-        if self.room["width"] >= (7/6)*self.room["height"]:
+        if self.room["width"] >= (width_height)*self.room["height"]:
             scale = self.gui_build["canvas_chairs"]["width"] / self.room["width"]
-            scale_size = 1 + (6.56 - self.room["width"])/self.room["width"]
+            scale_size = 1 + (canvas_chairs_meter_width - self.room["width"])/self.room["width"]
             pos_x_buffer = 0
             pos_y_buffer = 0.5 * (self.gui_build["canvas_chairs"]["height"] - ( self.room["height"] * scale ))
         #If the size of height of the room is the dominant size (if the height fit, the width will fit)
         else:
             scale = self.gui_build["canvas_chairs"]["height"] / self.room["height"]
-            scale_size = 1 + (5.62 - self.room["width"])/self.room["width"]
+            scale_size = 1 + (canvas_chairs_meter_height - self.room["width"])/self.room["width"]
             pos_x_buffer = 0.5 * (self.gui_build["canvas_chairs"]["width"] - ( self.room["width"] * scale ))
             pos_y_buffer = 0
-
         #Scale the size of 1 desk proportionally and import all the desks resized
         self.desk = {}
         new_desk_size = int(64*scale_size)
@@ -308,7 +318,8 @@ class Application():
         #64 pixel = 60 cm    espace = 700x600 pixel 6,56 x 5,62 metres
 
         #Draw the chairs
-        self.canvas_chairs.delete("all") 
+        self.canvas_chairs.delete("all")
+        self.list_color = []
         for chair in self.chairs: 
             pos_x = (chair[2]*scale) + pos_x_buffer
             pos_y = self.gui_build["canvas_chairs"]["height"] - ((chair[3] * scale) + pos_y_buffer)
@@ -318,12 +329,16 @@ class Application():
             elif state == "after":
                 if chair[4] == True:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["green"])
-                    if radius == True: #64 pixel = 75 cm --> donc distance (m) * 85.33 = nb pixel
-                        circle_radius = int(self.label_distance_actual.cget("text"))*scale
+                    if radius == True: 
+                        circle_radius = int(float(self.gui_settings["Distance"])*scale)
                         self.canvas_chairs.create_oval((pos_x - circle_radius),(pos_y - circle_radius),(pos_x + circle_radius),(pos_y + circle_radius),width=2,outline="#00ff0d")
                 else:
                     self.canvas_chairs.create_image(pos_x, pos_y, image=self.desk[orientation]["brown"])
                 if groups == True:
+                    while len(self.list_color) <= int(chair[5]): #create a new color for each group
+                        pick_color = "#{:06x}".format(random.randint(0, 0xFFFFFF))
+                        if pick_color not in self.list_color:
+                            self.list_color.append(pick_color)
                     side = int(new_desk_size/2)
                     self.canvas_chairs.create_rectangle((pos_x - side),(pos_y - side),(pos_x + side),(pos_y + side),width=2,outline=self.list_color[int(chair[5])])
                 
