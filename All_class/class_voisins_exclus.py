@@ -281,5 +281,3 @@ class Voisins_exclus:
             groups = pd.Categorical([row[5] for row in tableau], ordered=True)
             graphe = px.scatter(x=x_cord,y=y_cord,color=groups, symbol = occup, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
             graphe.show()   
-
-       

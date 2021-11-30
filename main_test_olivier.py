@@ -27,7 +27,7 @@ tableau, temps = optimize1.optimize()
 optimize1.resultat()
 optimize1.graphe_sortie()
 # tous_groupes = optimize1.tous_groupes
-
+#
 # optimize1.tableau_perfo
 # optimize1.interruption()
 # optimize1.graphe_entree()
