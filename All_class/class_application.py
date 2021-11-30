@@ -16,13 +16,13 @@ class Application():
         self.root = Tk()
         self.root.title("Optimisation de chaises App")
         self.root.iconbitmap(pathlib.Path(__file__).parents[1] / "Font_graphics/icon.ico")
-        self.root_width,self.root_height = 1230,620
+        self.root_width,self.root_height = 1230,640
         self.root_posx,self.root_posy = 20,20
         self.root.geometry(f"{self.root_width}x{self.root_height}+{self.root_posx}+{self.root_posy}")
         self.root.resizable(False,False)
         
         #Function menu and gui to set up the menu bar and the gui interface
-        #self.menu()
+        self.menu()
         self.gui()
         self.root.mainloop()
     def menu(self):
@@ -76,9 +76,9 @@ class Application():
         #Dictionnary of the general settings of each sections of the GUI
         self.gui_build = {
             "status_bar":{          "posx":0,  "posy":595,  "width":1230,    "height":20,   "color":"#ffffff"},
-            "frame_settings":{      "posx":5,  "posy":5,  "width":500,    "height":300,   "color":"#4A6572"},
-            "frame_buttons":{       "posx":5,  "posy":252, "width":500,     "height":50,     "color":"#F9AA33"}, #Pas le même système de width-height
-            "canvas_graph":{        "posx":5,  "posy":332, "width":503,    "height":258,   "color":"#4A6572"},
+            "frame_settings":{      "posx":5,  "posy":5,  "width":500,    "height":340,   "color":"#4A6572"},
+            "frame_buttons":{       "posx":5,  "posy":297, "width":500,     "height":70,     "color":"#4A6572"}, #Pas le même système de width-height
+            "canvas_graph":{        "posx":5,  "posy":372, "width":503,    "height":218,   "color":"#4A6572"},
             "canvas_chairs":{       "posx":510, "posy":3,  "width":710,    "height":587,   "color":"#4A6572"}}
 
 
@@ -101,7 +101,8 @@ class Application():
                 "Algorithm":"",
                 "Iterations":100,
                 "Time":10,
-                "Distance":2.0}
+                "Distance":2.0,
+                "Group_approach":0}
 
         #Settings - Settings
         self.label_data = Label(self.frame_settings, text="Settings",width=45,bg="#4A6572",fg="#ffffff",font=20)
@@ -118,7 +119,7 @@ class Application():
 
         #Settings - Algorithm
         #List of the available algorithm
-        self.algorithm_list = ["Voisins exclus"]
+        self.algorithm_list = ["Au hasard","Plus proche voisin","Plus loin voisin","Au hasard pondéré"]
         self.label_algorithm = Label(self.frame_settings, text="Algorithm",anchor="w",bg="#4A6572",fg="#ffffff")
         self.label_algorithm_actual = Label(self.frame_settings,text=self.gui_settings["Algorithm"],anchor="w",bg="#4A6572",fg="#ffffff")
         self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly",width=27, height=1)
@@ -159,24 +160,36 @@ class Application():
         self.label_distance_actual.grid(row=5,  column=1,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
         self.scale_distance.grid(       row=5,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
 
+        #Settings - Group_approach
+        self.group_approach = BooleanVar()
+        self.label_group_approach = Label(self.frame_settings, text="Use the group approach",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.button_group_approach = Checkbutton(self.frame_settings,text="", variable = self.group_approach,state=DISABLED, width=20, height=1, command=self.use_group)
+        
+        #self.group_approach.set(False)
+        self.label_group_approach.grid(         row=6,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
+        self.button_group_approach.grid(        row=6,  column=2,   columnspan=1, sticky="e",   padx=(10,20),    pady=(10,10))
+
         #Button - Optimization
-        self.button_optimisation = Button(self.frame_buttons,text="Optimize the room!",command=self.optimization,bg="#F9AA33",state=DISABLED, width=41, height=3)
+        self.button_optimisation = Button(self.frame_buttons,text="Optimize the room!",command=self.optimization,bg="#F9AA33",fg="#000000",state=DISABLED, width=41, height=3)
         self.button_optimisation.grid(  row=0,  column=0,   columnspan=2,   rowspan=2,  sticky="w",   padx=(10,10),    pady=(10,10))
         
-        #Settings - Show Radius button
+        #Button - Show Radius button
         self.show_radius = BooleanVar()
         self.show_radius.set(False)
 
-        self.button_show_radius = Checkbutton(self.frame_buttons,text="Display the radius",command=self.radius_group, variable = self.show_radius,state=DISABLED, width=20, height=1) #self.show_radius
+        self.button_show_radius = Checkbutton(self.frame_buttons,text="Display the radius",command=self.radius_group, variable = self.show_radius,state=DISABLED, width=20, height=1)
         self.button_show_radius.grid(  row=0,  column=2,   columnspan=1, sticky="e",   padx=(10,10),    pady=(10,0))
 
-        #Settings - Show groups
+        #Button - Show groups
         self.show_groups = BooleanVar()
         self.show_groups.set(False)
 
-        self.button_show_groups = Checkbutton(self.frame_buttons,text="Display the groups",command=self.radius_group, variable = self.show_groups,state=DISABLED, width=20, height=1) #self.radius_group
+        self.button_show_groups = Checkbutton(self.frame_buttons,text="Display the groups",command=self.radius_group, variable = self.show_groups,state=DISABLED, width=20, height=1) 
         self.button_show_groups.grid(  row=1,  column=2,   columnspan=1, sticky="e",   padx=(10,10),    pady=(10,10))
     
+        #Default variable
+        self.duree = 0
+        self.nb_group = 1
 
     def draw_graph(self):
         #Variables to count the number of sit and unsit chairs
@@ -189,13 +202,15 @@ class Application():
          #"width":503,    "height":258
         #Draw the new graph after deleting the old one
         self.canvas_graph.delete("all")
-        coordinates_arc = 10,20,250,250
-        coordinates_rect_use = 260,90,290,120
-        coordinates_rect_notuse = 260,150,290,180
-        coordinates_text_use = 300,105
-        coordinates_text_notuse = 300,165
-        coordinates_count_use = 440,105
-        coordinates_count_notuse = 440,165
+        coordinates_arc = 10,20,200,200
+        coordinates_rect_use = 220,20,250,50
+        coordinates_rect_notuse = 220,60,250,90
+        coordinates_text_use = 260,35
+        coordinates_text_notuse = 260,75
+        coordinates_count_use = 410,35
+        coordinates_count_notuse = 410,75
+        coordinates_time = 490,170
+        coordinates_group = 490,200
         use_end = 360*(float(self.count_use) / float(self.count_total))
         arc = self.canvas_graph.create_arc(coordinates_arc, start=0, extent=use_end, fill="green")
         arc = self.canvas_graph.create_arc(coordinates_arc, start=use_end, extent=(359.9999-use_end), fill="gray")
@@ -205,6 +220,9 @@ class Application():
         text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Unused chairs", anchor="w",font=20)
         text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w",font=20)
         text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w",font=20)
+
+        text = self.canvas_graph.create_text(coordinates_time, text = f"{round(self.duree,2)} secondes", anchor="e")
+        text = self.canvas_graph.create_text(coordinates_group, text = f"{int(self.nb_group)} groups", anchor="e")
     def comboclick(self,event):
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
@@ -226,8 +244,17 @@ class Application():
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.gui_settings["Distance"] = float(value)
+    def use_group(self):
+        self.button_show_radius.configure(state=DISABLED)
+        self.button_show_groups.configure(state=DISABLED)
+        group = self.group_approach.get()
+        self.gui_settings["Group_approach"] = bool(group)
 
-    def pick_file(self):
+    def radius_group(self):
+        radius = self.show_radius.get()
+        groups = self.show_groups.get()
+        self.draw_chairs(state="after",radius=radius,groups=groups)
+    def pick_file(self,reoptimize=False):
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.button_optimisation.configure(state=DISABLED)
@@ -245,38 +272,52 @@ class Application():
             self.data = Salles(app=True)
             self.room, self.chairs = self.data.chairs_list(self.gui_settings["Data_path"])
             #Draw all the chairs as empty (before)
+            self.duree = 0
+            self.nb_group = 1
             self.draw_graph()
             self.draw_chairs("before")
+            
+            
             #Activate the scales and the button
             self.scale_iteration.configure(state=NORMAL)
             self.scale_maximum_time.configure(state=NORMAL)
             self.scale_distance.configure(state=NORMAL)
+            self.button_group_approach.configure(state=NORMAL)
             self.button_optimisation.configure(state=NORMAL)
         except:
             print("Fichier non valide")
+
     def optimization(self):
+        
         for chair in range(0,len(self.chairs)):
             self.chairs[chair][4] = bool(0)
             while len(self.chairs[chair])>=6:
                 self.chairs[chair].pop(-1)
         #optimisation
-        if self.label_algorithm_actual.cget("text") == "Voisins exclus":
-            opti = Voisins_exclus(self.chairs,
-                float(self.gui_settings["Distance"]),
-                int(self.gui_settings["Iterations"]),
-                int(self.gui_settings["Time"]),
-                int(1), #methode
-                int(1)) #division
-            self.chairs, self.duree = opti.optimize()
+        if self.gui_settings["Algorithm"] == "Au hasard": methode = 1
+        elif self.gui_settings["Algorithm"] == "Plus proche voisin": methode = 2
+        elif self.gui_settings["Algorithm"] == "Plus loin voisin": methode = 3
+        elif self.gui_settings["Algorithm"] == "Au hasard pondéré": methode = 4
+
+        opti = Voisins_exclus(self.chairs,
+            float(self.gui_settings["Distance"]),
+            int(self.gui_settings["Iterations"]),
+            int(self.gui_settings["Time"]),
+            int(methode), #methode
+            int(self.gui_settings["Group_approach"])) #division
+        self.chairs, self.duree = opti.optimize()
+
+        self.nb_group = 1
+        for chair in self.chairs:
+            if chair[5] > self.nb_group:
+                self.nb_group = chair[5]
         self.draw_graph()
         self.draw_chairs("after")
+        
+        
         self.button_show_radius.configure(state=NORMAL)
         self.button_show_groups.configure(state=NORMAL)
         self.status_bar.configure(text="Optimization done        ")
-    def radius_group(self):
-        radius = self.show_radius.get()
-        groups = self.show_groups.get()
-        self.draw_chairs(state="after",radius=radius,groups=groups)
 
     def draw_chairs(self,state,radius=False,groups=False):
         #Scale the room to fit all the desk proportionally
@@ -341,4 +382,3 @@ class Application():
                             self.list_color.append(pick_color)
                     side = int(new_desk_size/2)
                     self.canvas_chairs.create_rectangle((pos_x - side),(pos_y - side),(pos_x + side),(pos_y + side),width=2,outline=self.list_color[int(chair[5])])
-                
