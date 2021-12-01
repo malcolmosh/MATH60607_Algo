@@ -5,7 +5,7 @@ import plotly.express as px
 
 ##test avec mes classes
 from All_class.class_dataset import Salles
-from All_class.class_voisins_exclus import Voisins_exclus
+from All_class.class_voisins_exclus_para import Voisins_exclus
 
 #importation données
 test=Salles(app=False)
@@ -19,17 +19,19 @@ info, salle_classe = test.chairs_list_test(saine)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=1000, methode=1, division=0)
+optimize1=Voisins_exclus(salle_classe,distance=1, iterations=500, methode=1, division=1)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
-optimize1.graphe_sortie()
+optimize1.temps()
+
+
+#optimize1.graphe_sortie()
 # tous_groupes = optimize1.tous_groupes
 #
 # optimize1.tableau_perfo
-# optimize1.interruption()
+optimize1.interruption()
 # optimize1.graphe_entree()
 
-# optimize1.temps()
 
 #générer données 
 def generer_donnees(salle, metaloops, distance, iterations, division):
@@ -110,7 +112,7 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
         titre="Salle Saine Marketing (56 sièges)"
         
     #details
-    details="Dist. "+str(distance)+" m. "+indicateur_div+", "+str(metaloops)+" méta-itérations, "+str(iterations)+" itérations"
+    details="Dist. "+str(distance)+"m. "+indicateur_div+", "+str(metaloops)+" méta-itérations, "+str(iterations)+" itérations"
 
     return(titre, details, data_graphe, derniere_iter_max, data_boite_moustache)
             
@@ -134,66 +136,52 @@ def generer_graphe(titre, details, data, derniere_iter_max):
     graphe.add_hline(y=max_chaises_atteint, line_dash="dot", annotation_text="Max. moyen atteint :"+str(round(max_chaises_atteint,2))+" chaises", annotation_position="top left", 
                      line_color="red")
     graphe.update_xaxes(range=[0,derniere_iter_max+10])
+    #nom_fichier=(titre+details[11:24]).replace(" ","_")
     graphe.show(config=config)   
+    #import kaleido
+    #graphe.write_image("Graphes/"+nom_fichier+".png",engine="kaleido", scale=5)
 
-def generer_boxplot(data):    
+
+
+def generer_barplot(data):    
     #produire graphe boîte à moustache pour comparer le nombre de chaise atteint
     data2=data.groupby(["methode","nb_chaises"], as_index=False).count()
-    data2['nb_chaises']=pd.Categorical(data2['nb_chaises'])
+    data2['nb_chaises']=pd.Categorical(data2['nb_chaises'].astype(int))
     fig = px.bar(data2,x="methode", y="epoch", color="nb_chaises",
                  title=titre+" - "+details,
-                 labels=dict(epoch="Nombre de méta-itérations", nb_chaises="Capacité calculée", methode="Méthode"))
+                 labels=dict(epoch="Nombre de méta-itérations", nb_chaises="Capacité calculée", methode="Méthode utilisée"))
     fig.update_layout(barmode='group')
+    nom_fichier=(("(BAR)")+titre+details[11:24]).replace(" ","_")
+    #fig.write_image("Graphes/"+nom_fichier+".png")
     fig.show()
 
-
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot = generer_donnees(salle=saine, metaloops=2, distance=2, iterations=10, division=0)
+titre, details, data_graphe, derniere_iter_max, data_boxplot = generer_donnees(salle=saine, metaloops=10, distance=2, iterations=2000, division=0)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max)
 
-generer_boxplot(data=data_boxplot)
+generer_barplot(data=data_boxplot)
 
-#graphe.update_yaxes()
-#graphe.layout.yaxis2.matches = 'y2'
+#comparatif temps
+#PAS parallèle
+from All_class.class_voisins_exclus import Voisins_exclus
+info, salle_classe = test.chairs_list_test(mega)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
+tableau, temps = optimize1.optimize()
+temps_non_para=temps
 
+#parallélisé
+from All_class.class_voisins_exclus_para import Voisins_exclus
+info, salle_classe = test.chairs_list_test(mega)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
+tableau, temps = optimize1.optimize()
+temps_para=temps
 
-# #enlever groupes avec 1 chaise
-# data_graphe.drop(data_graphe[data_graphe["nb_chaises"]==1].index, inplace=True)
-# data_graphe.reset_index(inplace=True)
+data_parallele=pd.DataFrame((round(temps_non_para,1),round(temps_para,1)), columns=["Temps en secondes"])
+data_parallele['Stratégie']=["Non parallélisé", "Parallélisé"]
 
-# #offset values by methode
-# for i in range(1, len(data_graphe)):
-#     if data_graphe.loc[i,'methode_num']==2:
-#         data_graphe.loc[i,'nb_chaises']+=0.05
-#     elif data_graphe.loc[i,'methode_num']==3:
-#         data_graphe.loc[i,'nb_chaises']+=0.10
-#     elif data_graphe.loc[i,'methode_num']==4:
-#         data_graphe.loc[i,'nb_chaises']+=0.15   
+#
+fig = px.bar(data_parallele,x="Stratégie", y="Temps en secondes",title="Performance de la parallélisation - salle de 1105 sièges divisée en groupes,5000 itérations")
+fig.show()
 
-
-
-#graphe 2
-graphe = px.line(data_graphe, x='iteration',y='nb_chaises', facet_row = 'groupe', facet_col="methode", color='methode')
-# graphe.update_yaxes()
-graphe.layout.yaxis2.matches = 'y2'
-graphe.layout.yaxis6.matches = 'y5'
-graphe.layout.yaxis7.matches = 'y5'
-graphe.layout.yaxis8.matches = 'y5'
-graphe.show()   
-
-
-#tester avec manuvie, avec grande salle rectangulaire, avec grande salle qui a des division
-
-
-#creer salle classe grand carré (500 places)
-test=[]
-
-for i in range(1,20):
-    for j in range(1,10):
-        a=[i,"south",i,j,False]
-        test.append(a)
-
-for i in range(1,len(salle_classe)):
-    test[i][0]=i+1
-salle_classe=test
+#https://stackoverflow.com/questions/21027477/joblib-parallel-multiple-cpus-slower-than-single
