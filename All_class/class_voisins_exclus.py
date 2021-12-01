@@ -114,7 +114,7 @@ class Voisins_exclus:
                         
                     if self.methode==2 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
                         #trouver plus proche voisin admissible
-                        voisins = dist_eucl[(dist_eucl>=self.distance)] # retenir toutes les chaises à plus de la distance spécifiée 
+                        voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la distance spécifiée 
  
                         if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
                             prochaine_chaise = random.choice(chaises[en_jeu]) #choisir au hasard 
@@ -126,7 +126,7 @@ class Voisins_exclus:
              
                     elif self.methode==3 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
                         #trouver plus loin voisin admissible
-                        voisins = dist_eucl[(dist_eucl>=self.distance)] # retenir toutes les chaises à plus de la mesure de distanciation
+                        voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la mesure de distanciation
 
                         if (min(voisins)==max(voisins)): #si aucun voisin ou si voisins min et max sont à la même distance #voisins.size==0 or 
                             prochaine_chaise = random.choice(chaises[en_jeu]) #choisir au hasard
@@ -138,7 +138,7 @@ class Voisins_exclus:
             
                     elif self.methode==4 and while_index>0 and sum(en_jeu)>1:  #si algorithme voisin pondéré est choisi et si on est à la 2e boucle while 
                         #trouver prochain voisin admissible avec une probabilité pondérée 
-                        voisins = dist_eucl[(dist_eucl>=self.distance)] # retenir toutes les chaises à plus de la mesure de distanciation
+                        voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la mesure de distanciation
 
                         if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
                             prochaine_chaise = random.choice(chaises[en_jeu]) #prendre la prochaine chaise au hasard
@@ -279,5 +279,5 @@ class Voisins_exclus:
             y_cord = [row[3] for row in tableau]
             occup = pd.Categorical([row[4] for row in tableau], categories=[0,1], ordered=True)
             groups = pd.Categorical([row[5] for row in tableau], ordered=True)
-            graphe = px.scatter(x=x_cord,y=y_cord,color=groups, symbol = occup, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
+            graphe = px.scatter(x=x_cord,y=y_cord,symbol=groups, color = occup, size = [1]*len(tableau), range_x=[0,max(x_cord)+1], range_y=[0,max(y_cord)+1]) 
             graphe.show()   
