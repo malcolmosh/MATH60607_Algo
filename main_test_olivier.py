@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Dec  2 18:22:39 2021
+
+@author: osher
+"""
+
 #import random, pathlib, os, math, pygame
 import pandas as pd
 import numpy as np
@@ -5,7 +13,7 @@ import plotly.express as px
 
 ##test avec mes classes
 from All_class.class_dataset import Salles
-from All_class.class_voisins_exclus_para import Voisins_exclus
+from All_class.class_voisins_exclus import Voisins_exclus
 
 #importation données
 test=Salles(app=False)
@@ -28,10 +36,10 @@ optimize1.temps()
 
 #optimize1.graphe_sortie()
 # tous_groupes = optimize1.tous_groupes
-#
-# optimize1.tableau_perfo
-optimize1.interruption()
-# optimize1.graphe_entree()
+# #
+# # optimize1.tableau_perfo
+# optimize1.interruption()
+# # optimize1.graphe_entree()
 
 
 #générer données 
@@ -105,9 +113,9 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     
     #division
     if division==1:
-        indicateur_div="Avec division"
+        indicateur_div="avec division"
     else:
-        indicateur_div="Sans division"
+        indicateur_div="sans division"
         
     #titre salle
     if salle==mega:
@@ -122,56 +130,49 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
         titre="Salle Saine Marketing (56 sièges)"
         
     #details
-    details="Dist. "+str(distance)+"m. "+indicateur_div+", "+str(metaloops)+" méta-itérations, "+str(iterations)+" itérations"
+    details="Distance: "+str(distance)+"m., "+indicateur_div+", "+str(metaloops)+" méta-itérations, "+str(iterations)+" itérations"
 
     return(titre, details, data_graphe, derniere_iter_max, data_boite_moustache, max_chaises_atteint)
             
 def generer_graphe(titre, details, data, derniere_iter_max, max_chaises_atteint):
-    config = {
-      'toImageButtonOptions': {
-        'format': 'png', # one of png, svg, jpeg, webp
+    #config affichage
+    config = {'toImageButtonOptions': {'format': 'png', # one of png, svg, jpeg, webp
         'filename': 'plot',
-        'scale': 5 # Multiply title/legend/axis/canvas sizes by this factor
-      }
-    }
-    
+        'scale': 5 }} # Multiply title/legend/axis/canvas sizes by this factor 
     #produire graphe
     graphe = px.line(data, x='iteration',y='nb_chaises', color="methode", 
                      labels=dict(iteration="Itération", nb_chaises="Capacité calculée", methode="Méthode"), 
-                     title=titre+" - "+details)
+                     title=titre+"<br><sup>"+details+"</sup>")
+                     #color_discrete_sequence=px.colors.qualitative.G10)
     graphe.update_traces(mode="lines", line_shape="vh", line=dict(width=4))
-    graphe.add_hline(y=max_chaises_atteint, line_dash="dot", annotation_text="Max. moyen atteint :"+str(round(max_chaises_atteint,2))+" chaises", annotation_position="top left", 
-                     line_color="red")
+    #graphe.add_hline(y=max_chaises_atteint, line_dash="dot", annotation_text="Max. moyen atteint :"+str(round(max_chaises_atteint,2))+" chaises", annotation_position="top left", line_color="red")
    # graphe.update_xaxes(range=[0,derniere_iter_max+10])
-    #nom_fichier=(titre+details[11:24]).replace(" ","_")
+    nom_fichier=(titre+details[11:24]).replace(" ","_")
     graphe.show(config=config)   
-    #import kaleido
-    #graphe.write_image("Graphes/"+nom_fichier+".png",engine="kaleido", scale=5)
-
-
+    import kaleido
+    graphe.write_image("Graphes/"+nom_fichier+".png",engine="kaleido", scale=5)
 
 def generer_barplot(data):    
-    config = {
-      'toImageButtonOptions': {
-        'format': 'png', # one of png, svg, jpeg, webp
+    #config affichage
+    config = {'toImageButtonOptions': {'format': 'png', # one of png, svg, jpeg, webp
         'filename': 'plot',
-        'scale': 5 # Multiply title/legend/axis/canvas sizes by this factor
-      }
-    }
-
-    #produire graphe boîte à moustache pour comparer le nombre de chaise atteint
+        'scale': 5 }} # Multiply title/legend/axis/canvas sizes by this factor 
+    #produire graphe  pour comparer le nombre de chaise atteint au travers des méta-itérations
     data2=data.groupby(["methode","nb_chaises"], as_index=False).count()
     data2['nb_chaises']=pd.Categorical(data2['nb_chaises'].astype(int))
     fig = px.bar(data2,x="methode", y="epoch", color="nb_chaises",
-                 title=titre+" - "+details,
+                 title=titre+"<br><sup>"+details+"</sup>",
                  labels=dict(epoch="Nombre de méta-itérations", nb_chaises="Capacité calculée", methode="Méthode utilisée"))
     fig.update_layout(barmode='group')
     #nom_fichier=(("(BAR)")+titre+details[11:24]).replace(" ","_")
     #fig.write_image("Graphes/"+nom_fichier+".png")
+    import kaleido
+    nom_fichier=(titre+details[11:24]).replace(" ","_")
+    fig.write_image("Graphes/"+nom_fichier+"_bar.png",engine="kaleido", scale=5)
     fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=banque, metaloops=5, distance=2, iterations=100, division=0)
+titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=banque, metaloops=1, distance=2, iterations=10000, division=0)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max, max_chaises_atteint=max_chaises_atteint)
 
