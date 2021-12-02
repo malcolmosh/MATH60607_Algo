@@ -140,19 +140,35 @@ class Voisins_exclus:
                                 prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
                 
                         elif self.methode==4 and while_index>0 and sum(en_jeu)>1:  #si algorithme voisin pondéré est choisi et si on est à la 2e boucle while 
-                            #trouver prochain voisin admissible avec une probabilité pondérée 
-                            voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la mesure de distanciation
-    
-                            if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
-                                prochaine_chaise = random.choice(chaises[en_jeu]) #prendre la prochaine chaise au hasard
-    
+                            #plus proche voisin pondéré 
+                            voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de 2m
+                            
+                            if voisins.size==0 or voisins.size==1 or (min(voisins)==max(voisins)):
+                                prochaine_chaise = random.choice(chaises[en_jeu])
+                                         
                             else:
-                                dist_loin_voisin = max(voisins) #trouver voisin le plus loin (si il y en a deux, le premier)
-                                ratios =(1-(voisins/dist_loin_voisin))/(sum(1-(voisins/dist_loin_voisin))) #construire un ratio de distances
-                                choix = random.choices(voisins, weights=ratios, k=1)[0] #choisir au hasard avec ces poids de ratio 
+                                dist_loin_voisin = max(voisins)+0.1 
+                                dist_proche_voisin = min(voisins)
+                                ratios = ((dist_loin_voisin-voisins)/(dist_loin_voisin-dist_proche_voisin))/sum(((dist_loin_voisin-voisins)/(dist_loin_voisin-dist_proche_voisin)))
+                                choix = random.choices(voisins, weights=ratios, k=1)[0]
                                 index = dist_eucl.tolist().index(choix) #index de cette chaise dans la liste des distances euclidiennes
                                 prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
-    
+                                
+                        elif self.methode==5 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
+                            #plus loin voisin pondéré
+                            voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de 2m
+                            
+                            if voisins.size==0 or voisins.size==1 or (min(voisins)==max(voisins)):
+                                prochaine_chaise = random.choice(chaises[en_jeu])
+                                         
+                            else:
+                                dist_loin_voisin = max(voisins)+0.1 
+                                dist_proche_voisin = min(voisins)
+                                ratios = ((voisins-dist_proche_voisin)/(dist_loin_voisin-dist_proche_voisin))/sum(((voisins-dist_proche_voisin)/(dist_loin_voisin-dist_proche_voisin)))
+                                choix = random.choices(voisins, weights=ratios, k=1)[0]
+                                index = dist_eucl.tolist().index(choix) #index de cette chaise dans la liste des distances euclidiennes
+                                prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proch. chaise dans le array des chaises en jeu
+
                         else: #méthode==1
                             prochaine_chaise = random.choice(chaises[en_jeu]) #choisir chaise au hasard parmi celles en jeu
                         

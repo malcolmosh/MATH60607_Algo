@@ -5,7 +5,7 @@ import plotly.express as px
 
 ##test avec mes classes
 from All_class.class_dataset import Salles
-from All_class.class_voisins_exclus import Voisins_exclus
+from All_class.class_voisins_exclus_para import Voisins_exclus
 
 #importation données
 test=Salles(app=False)
@@ -15,13 +15,14 @@ banque= "Salle Banque Scotia.txt"
 cogeco = "Salle Cogeco.txt"
 manuvie = "Salle Manuvie.txt"
 saine = "Salle Saine Marketing.txt"
-info, salle_classe = test.chairs_list_test(saine)
+info, salle_classe = test.chairs_list_test(banque)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=500, methode=4, division=0)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
+optimize1.graphe_sortie()
 optimize1.temps()
 
 
@@ -43,7 +44,7 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     for epoch in range(1,metaloops+1):
         meta_liste=[]
         #boucle méthodes
-        for i in range(1,5):
+        for i in range(1,6):
             optimize1=Voisins_exclus(salle_classe,distance=distance,iterations=iterations,methode=i, division=division)
             optimize1.optimize()
             tous_groupes = [[epoch]+row for row in optimize1.tous_groupes]
@@ -53,35 +54,44 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     
     #créer dataframe
     data_graphe = pd.DataFrame(np.concatenate(np.concatenate(meta_liste_2)),columns=['epoch', 'groupe', 'iteration','nb_chaises','methode_num'])
+    
+    #data_graphe[data_graphe["nb_chaises"]==15]['methode_num'].unique()
+    
     #ajouter nom methode
-    data_graphe['methode'] = data_graphe['methode_num'].map({1:"Voisin aléatoire",2:"Plus proche voisin",3:"Plus loin voisin",4:"Plus proche voisin pondéré"}) 
+    data_graphe['methode'] = data_graphe['methode_num'].map({1:"Voisin aléatoire",2:"Plus proche voisin",3:"Plus loin voisin",4:"Plus proche voisin pondéré", 5:"Plus loin voisin pondéré"}) 
  
     #pour box plot 
     data_boite_moustache = data_graphe.groupby(["methode","epoch"], as_index=False).max()
     data_boite_moustache= data_boite_moustache.drop(columns=["groupe","iteration","methode_num"])
-    data_graphe[data_graphe['nb_chaises']==13]
+    #data_graphe[data_graphe['nb_chaises']==13]
 
     #écraser les groupes au travers des epoch, methode et iterations
     data_graphe = data_graphe.groupby(["epoch","methode_num", "methode", "iteration"], as_index=False).sum()
+    data_graphe=data_graphe.drop(columns="groupe")
+    
+    #data_graphe[data_graphe["nb_chaises"]==15]['methode_num'].unique()
     
     #remplacer le nombre de chaises dans chaque epoch, méthode et dans chaque groupe par le maximum, une fois qu'il est atteint
     data_np = np.array(data_graphe)
+    data_graphe.columns
     for i in range (1,len(data_np)):
-        if data_np[i,0]==data_np[i-1,0] and data_np[i,1]==data_np[i-1,1] and data_np[i,4]==data_np[i-1,4]:
-            if data_np[i,5]<=data_np[i-1,5]:
-                data_np[i,5]=data_np[i-1,5]
+        if data_np[i,0]==data_np[i-1,0] and data_np[i,1]==data_np[i-1,1]: #and data_np[i,4]==data_np[i-1,4]:
+            if data_np[i,4]<=data_np[i-1,4]:
+                data_np[i,4]=data_np[i-1,4]
 
     #reconvertir en pandas
     data_graphe = pd.DataFrame(data_np, columns=data_graphe.columns)
     
     #moyenne au travers des méta-loops
-    data_graphe= data_graphe.groupby(['methode','methode_num','groupe','iteration'],as_index=False).mean()
+    data_graphe= data_graphe.groupby(['methode','methode_num','iteration'],as_index=False).mean()
     data_graphe = data_graphe.drop(columns="epoch")
     data_graphe.reset_index(inplace=True)
+    
 
     #max chaises
     max_chaises_atteint = data_graphe['nb_chaises'].max() 
     #trouver l'itération maximale à laquelle une des méthodes finit par converger à 100% (pour ajuster axes)
+    ### À REVOIR
     derniere_iter_max = data_graphe[data_graphe['nb_chaises']==max_chaises_atteint].groupby("methode_num").first()['iteration'].max()
     
     # # #offset values by methode
@@ -114,9 +124,9 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     #details
     details="Dist. "+str(distance)+"m. "+indicateur_div+", "+str(metaloops)+" méta-itérations, "+str(iterations)+" itérations"
 
-    return(titre, details, data_graphe, derniere_iter_max, data_boite_moustache)
+    return(titre, details, data_graphe, derniere_iter_max, data_boite_moustache, max_chaises_atteint)
             
-def generer_graphe(titre, details, data, derniere_iter_max):
+def generer_graphe(titre, details, data, derniere_iter_max, max_chaises_atteint):
     config = {
       'toImageButtonOptions': {
         'format': 'png', # one of png, svg, jpeg, webp
@@ -124,9 +134,6 @@ def generer_graphe(titre, details, data, derniere_iter_max):
         'scale': 5 # Multiply title/legend/axis/canvas sizes by this factor
       }
     }
-
-    #max chaises
-    max_chaises_atteint = data_graphe['nb_chaises'].max() 
     
     #produire graphe
     graphe = px.line(data, x='iteration',y='nb_chaises', color="methode", 
@@ -135,7 +142,7 @@ def generer_graphe(titre, details, data, derniere_iter_max):
     graphe.update_traces(mode="lines", line_shape="vh", line=dict(width=4))
     graphe.add_hline(y=max_chaises_atteint, line_dash="dot", annotation_text="Max. moyen atteint :"+str(round(max_chaises_atteint,2))+" chaises", annotation_position="top left", 
                      line_color="red")
-    graphe.update_xaxes(range=[0,derniere_iter_max+10])
+   # graphe.update_xaxes(range=[0,derniere_iter_max+10])
     #nom_fichier=(titre+details[11:24]).replace(" ","_")
     graphe.show(config=config)   
     #import kaleido
@@ -164,32 +171,32 @@ def generer_barplot(data):
     fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot = generer_donnees(salle=mega, metaloops=5, distance=2, iterations=100, division=1)
+titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=banque, metaloops=5, distance=2, iterations=100, division=0)
 
-generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max)
+generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max, max_chaises_atteint=max_chaises_atteint)
 
 generer_barplot(data=data_boxplot)
 
 #comparatif temps
-#PAS parallèle
-from All_class.class_voisins_exclus import Voisins_exclus
-info, salle_classe = test.chairs_list_test(mega)
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
-tableau, temps = optimize1.optimize()
-temps_non_para=temps
+# #PAS parallèle
+# from All_class.class_voisins_exclus import Voisins_exclus
+# info, salle_classe = test.chairs_list_test(mega)
+# optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
+# tableau, temps = optimize1.optimize()
+# temps_non_para=temps
 
-#parallélisé
-from All_class.class_voisins_exclus_para import Voisins_exclus
-info, salle_classe = test.chairs_list_test(mega)
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
-tableau, temps = optimize1.optimize()
-temps_para=temps
+# #parallélisé
+# from All_class.class_voisins_exclus_para import Voisins_exclus
+# info, salle_classe = test.chairs_list_test(mega)
+# optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
+# tableau, temps = optimize1.optimize()
+# temps_para=temps
 
-data_parallele=pd.DataFrame((round(temps_non_para,1),round(temps_para,1)), columns=["Temps en secondes"])
-data_parallele['Stratégie']=["Non parallélisé", "Parallélisé"]
+# data_parallele=pd.DataFrame((round(temps_non_para,1),round(temps_para,1)), columns=["Temps en secondes"])
+# data_parallele['Stratégie']=["Non parallélisé", "Parallélisé"]
 
-#
-fig = px.bar(data_parallele,x="Stratégie", y="Temps en secondes",title="Performance de la parallélisation - salle de 1105 sièges divisée en groupes,5000 itérations")
-fig.show()
+# #
+# fig = px.bar(data_parallele,x="Stratégie", y="Temps en secondes",title="Performance de la parallélisation - salle de 1105 sièges divisée en groupes,5000 itérations")
+# fig.show()
 
 #https://stackoverflow.com/questions/21027477/joblib-parallel-multiple-cpus-slower-than-single
