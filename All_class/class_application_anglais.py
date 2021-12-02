@@ -119,7 +119,7 @@ class Application():
 
         #Settings - Algorithm
         #List of the available algorithm
-        self.algorithm_list = ["Au hasard","Plus proche voisin","Plus loin voisin","Au hasard pondéré"]
+        self.algorithm_list = ["Au hasard","Plus proche voisin","Plus proche voisin pondéré", "Plus loin voisin pondéré"]
         self.label_algorithm = Label(self.frame_settings, text="Algorithm",anchor="w",bg="#4A6572",fg="#ffffff")
         self.label_algorithm_actual = Label(self.frame_settings,text=self.gui_settings["Algorithm"],anchor="w",bg="#4A6572",fg="#ffffff")
         self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly",width=27, height=1)
@@ -297,7 +297,8 @@ class Application():
         if self.gui_settings["Algorithm"] == "Au hasard": methode = 1
         elif self.gui_settings["Algorithm"] == "Plus proche voisin": methode = 2
         elif self.gui_settings["Algorithm"] == "Plus loin voisin": methode = 3
-        elif self.gui_settings["Algorithm"] == "Au hasard pondéré": methode = 4
+        elif self.gui_settings["Algorithm"] == "Plus proche voisin pondéré": methode = 4
+        elif self.gui_settings["Algorithm"] == "Plus loin voisin pondéré": methode = 5
 
         opti = Voisins_exclus(self.chairs,
             float(self.gui_settings["Distance"]),

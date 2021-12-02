@@ -51,14 +51,14 @@ class Application():
             initialdir=pathlib.Path(__file__).parent.parent / "Export_files",
             title="Enregistrer sous")
         with open(path_file, 'w') as f:
-            f.write(f"num\torient\tpos_x\tpos_y\tuse\n")
+            f.write(f"num\torient\tpos_x\tpos_y\tuse\tgroup\n")
             for chair in self.chairs:
-                line = f"{chair[0]}\t{chair[1]}\t{chair[2]}\t{chair[3]}\t{True if int(chair[4]) == 1 else False}\n"
+                line = f"{chair[0]}\t{chair[1]}\t{chair[2]}\t{chair[3]}\t{True if int(chair[4]) == 1 else False}\t{chair[5]}\n"
                 f.write(line)
             f.write(
-                f"\nNombre de chaises utilisées:\t{self.count_use}\t-> {round(100*(float(self.count_use)/float(self.count_total)),2)}%\n"
+                f"\nNombre de chaises utilisées:\t\t{self.count_use}\t-> {round(100*(float(self.count_use)/float(self.count_total)),2)}%\n"
                 f"Nombre de chaises non utilisées:\t{self.count_notuse}\t-> {round(100*(float(self.count_notuse)/float(self.count_total)),2)}%\n"
-                f"Nombre de chaises total:\t{self.count_total}\t-> {100.00}%\n")
+                f"Nombre de chaises total:\t\t{self.count_total}\t-> {100.00}%\n")
 
     def about(self):
         root_about = Tk()
@@ -119,7 +119,7 @@ class Application():
 
         #Settings - Algorithm
         #List of the available algorithm
-        self.algorithm_list = ["Au hasard","Plus proche voisin","Plus loin voisin","Au hasard pondéré"]
+        self.algorithm_list = ["Au hasard","Plus proche voisin","Plus loin voisin","Plus proche voisin pondéré", "Plus loin voisin pondéré"]
         self.label_algorithm = Label(self.frame_settings, text="Algorithme",anchor="w",bg="#4A6572",fg="#ffffff")
         self.label_algorithm_actual = Label(self.frame_settings,text=self.gui_settings["Algorithm"],anchor="w",bg="#4A6572",fg="#ffffff")
         self.combobox_algorithm = ttk.Combobox(self.frame_settings, values=self.algorithm_list, state="readonly",width=27, height=1)
@@ -212,17 +212,17 @@ class Application():
         coordinates_time = 490,170
         coordinates_group = 490,200
         use_end = 360*(float(self.count_use) / float(self.count_total))
-        arc = self.canvas_graph.create_arc(coordinates_arc, start=0, extent=use_end, fill="green")
+        arc = self.canvas_graph.create_arc(coordinates_arc, start=0, extent=use_end-0.0001, fill="green")
         arc = self.canvas_graph.create_arc(coordinates_arc, start=use_end, extent=(359.9999-use_end), fill="gray")
         rect = self.canvas_graph.create_rectangle(coordinates_rect_use,fill="green")
         rect = self.canvas_graph.create_rectangle(coordinates_rect_notuse, fill="gray")
-        text = self.canvas_graph.create_text(coordinates_text_use, text = "Nombre de chaises utilisées", anchor="w")
-        text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Nombre de chaises non utilisées", anchor="w")
-        text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w")
-        text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w")
+        text = self.canvas_graph.create_text(coordinates_text_use, text = "Nombre de chaises utilisées", anchor="w",fill="#ffffff")
+        text = self.canvas_graph.create_text(coordinates_text_notuse, text = "Nombre de chaises non utilisées", anchor="w",fill="#ffffff")
+        text = self.canvas_graph.create_text(coordinates_count_use, text = str(self.count_use), anchor="w",fill="#ffffff")
+        text = self.canvas_graph.create_text(coordinates_count_notuse, text = str(self.count_notuse), anchor="w",fill="#ffffff")
 
-        text = self.canvas_graph.create_text(coordinates_time, text = f"{round(self.duree,2)} secondes", anchor="e")
-        text = self.canvas_graph.create_text(coordinates_group, text = f"{int(self.nb_group)} groupes", anchor="e")
+        text = self.canvas_graph.create_text(coordinates_time, text = f"{round(self.duree,2)} secondes", anchor="e",fill="#ffffff")
+        text = self.canvas_graph.create_text(coordinates_group, text = f"{int(self.nb_group)} groupes", anchor="e",fill="#ffffff")
     def comboclick(self,event):
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
@@ -285,6 +285,9 @@ class Application():
             self.button_group_approach.configure(state=NORMAL)
             self.button_optimisation.configure(state=NORMAL)
         except:
+            self.gui_settings["Data_name"] = ""
+            self.gui_settings["Data_path"] = ""
+            self.label_data_actual.configure(text=self.gui_settings["Data_name"])
             print("Fichier non valide")
 
     def optimization(self):
@@ -297,8 +300,8 @@ class Application():
         if self.gui_settings["Algorithm"] == "Au hasard": methode = 1
         elif self.gui_settings["Algorithm"] == "Plus proche voisin": methode = 2
         elif self.gui_settings["Algorithm"] == "Plus loin voisin": methode = 3
-        elif self.gui_settings["Algorithm"] == "Au hasard pondéré": methode = 4
-
+        elif self.gui_settings["Algorithm"] == "Plus proche voisin pondéré": methode = 4
+        elif self.gui_settings["Algorithm"] == "Plus loin voisin pondéré": methode = 5
         opti = Voisins_exclus(self.chairs,
             float(self.gui_settings["Distance"]),
             int(self.gui_settings["Iterations"]),
