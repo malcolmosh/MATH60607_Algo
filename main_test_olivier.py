@@ -5,7 +5,7 @@ import plotly.express as px
 
 ##test avec mes classes
 from All_class.class_dataset import Salles
-from All_class.class_voisins_exclus_para import Voisins_exclus
+from All_class.class_voisins_exclus import Voisins_exclus
 
 #importation données
 test=Salles(app=False)
@@ -19,7 +19,7 @@ info, salle_classe = test.chairs_list_test(saine)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=1, iterations=500, methode=1, division=1)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
 optimize1.temps()
@@ -105,7 +105,7 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     elif salle==banque:
         titre="Salle Banque Scotia (70 sièges)"
     elif salle==cogeco:
-        titre=="Salle Cogeco (31 sièges)"
+        titre="Salle Cogeco (31 sièges)"
     elif salle==manuvie:
         titre="Salle Manuvie (55 sièges)"
     elif salle==saine:
@@ -144,6 +144,14 @@ def generer_graphe(titre, details, data, derniere_iter_max):
 
 
 def generer_barplot(data):    
+    config = {
+      'toImageButtonOptions': {
+        'format': 'png', # one of png, svg, jpeg, webp
+        'filename': 'plot',
+        'scale': 5 # Multiply title/legend/axis/canvas sizes by this factor
+      }
+    }
+
     #produire graphe boîte à moustache pour comparer le nombre de chaise atteint
     data2=data.groupby(["methode","nb_chaises"], as_index=False).count()
     data2['nb_chaises']=pd.Categorical(data2['nb_chaises'].astype(int))
@@ -151,12 +159,12 @@ def generer_barplot(data):
                  title=titre+" - "+details,
                  labels=dict(epoch="Nombre de méta-itérations", nb_chaises="Capacité calculée", methode="Méthode utilisée"))
     fig.update_layout(barmode='group')
-    nom_fichier=(("(BAR)")+titre+details[11:24]).replace(" ","_")
+    #nom_fichier=(("(BAR)")+titre+details[11:24]).replace(" ","_")
     #fig.write_image("Graphes/"+nom_fichier+".png")
-    fig.show()
+    fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot = generer_donnees(salle=saine, metaloops=10, distance=2, iterations=2000, division=0)
+titre, details, data_graphe, derniere_iter_max, data_boxplot = generer_donnees(salle=mega, metaloops=5, distance=2, iterations=100, division=1)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max)
 
