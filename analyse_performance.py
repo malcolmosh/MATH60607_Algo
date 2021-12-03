@@ -172,7 +172,7 @@ def generer_barplot(data):
     fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=banque, metaloops=1, distance=2, iterations=10000, division=0)
+titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=mega, metaloops=1, distance=2, iterations=3000, division=1)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max, max_chaises_atteint=max_chaises_atteint)
 
