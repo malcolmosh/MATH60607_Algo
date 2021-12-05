@@ -20,13 +20,14 @@ import pandas as pd
 #créer classe
 class Voisins_exclus:
     
-    def __init__(self, data,distance,iterations=500, maximum_time=5, methode=1, division=0):
+    def __init__(self, data,distance,iterations=500, maximum_time=5, methode=1, division=0, analyse_perfo=0):
         self.data = data
         self.distance = distance
         self.iterations = iterations
         self.maximum_time = maximum_time
         self.methode=methode
         self.division = division
+        self.analyse_perfo= analyse_perfo
         self.tableau_optimal=()
         
     #vérifier si les listes du début sont vides ou pas
@@ -77,21 +78,13 @@ class Voisins_exclus:
         #nombre de groupes
         nombre_groupes = set(donnees[:,4].tolist()) 
             
-        #liste pour la meilleure configuration de chaque groupe
-        meilleurs_groupes=[] 
-        
-        #entreposer toutes les configurations de chaque itération pour tous les groupes
-        tous_groupes=[]
-        
-        #liste pour entrepose le numero de groupe, le nombre de chaises et l'index de l'itération avec le meilleur résultat
-        #cette liste sert à évaluer la performance de la méthode choisie
-        tableau_perfo=[]
-        
         #boucle pour chaque groupe
-        for i in nombre_groupes: 
+        def calcul_groupe(i):
             
-            resultat_iterations=[] #tableau d'occupation des chaises du groupe i
-            somme_iterations=[] #nombre de chaises du groupe i
+            #tableau d'occupation des chaises du groupe i
+            resultat_iterations=[]
+            #nombre de chaises du groupe i
+            somme_iterations=[] 
 
             for j in range(self.iterations): 
                 
@@ -197,8 +190,13 @@ class Voisins_exclus:
                 resultat_iterations.append(exclus)
                 #ajouter la somme des chaises occupées
                 somme_iterations.append(exclus[:,3].sum())
-                #ajouter le # de groupe, le # de l'itération et la somme des chaises occupées
-                tous_groupes.append([i,j,exclus[:,3].sum(),self.methode])
+
+
+                if self.analyse_perfo==0:
+                    #entreposer toutes les configurations de chaque itération pour tous les groupes
+                    tous_groupes=[]
+                    #ajouter le # de groupe, le # de l'itération et la somme des chaises occupées
+                    tous_groupes.append([i,j,exclus[:,3].sum(),self.methode])
 
                 #early stopping with time
                 time_now = time.time() #moment de fin de l'itération 
@@ -211,17 +209,27 @@ class Voisins_exclus:
                 else:
                     interrompu=0
 
-
             capacite_opt_groupe=max(somme_iterations) #capacité optimale trouvée pour ce groupe
             index_best=somme_iterations.index(capacite_opt_groupe) #index de cette meilleure itération
-            meilleur_subset=resultat_iterations[index_best] #retenir tableau optimal à cet index 
-            meilleurs_groupes.append(meilleur_subset) #ajouter le tableau de ce meilleur sous-ensemble à la liste des groupes
+            meilleur_subset=resultat_iterations[index_best] #retenir tableau optimal à cet index           
             nombre_chaises = len(meilleur_subset) #nombre de chaises de ce sous-groupe
-            tableau_perfo.append([i,nombre_chaises, index_best]) #ajouter détails dans tableau perfo
-            
-        # retenir meilleur résultat    
-        #concatener tous les meilleurs résultat ensemble
-        exclus_final = np.concatenate(meilleurs_groupes)
+
+            if self.analyse_perfo==0:
+                return([[i,nombre_chaises,index_best], meilleur_subset,tous_groupes, interrompu]) #sortir tableau perfo, meilleur tableau, tous les tableaux de toutes les itérations pour ce groupe, avis d'interruption
+            else:
+                return([[i,nombre_chaises,index_best], meilleur_subset,0, interrompu]) #éviter de sortir les données perfo
+
+        resultat = (calcul_groupe(i) for i in nombre_groupes)
+
+        #liste pour entrepose le numero de groupe, le nombre de chaises et l'index de l'itération avec le meilleur résultat
+        tableau_perfo=[item[0] for item in resultat]
+        #liste pour la meilleure configuration de chaque groupe (concaténer les résultats ensemble)
+        exclus_final=np.concatenate([item[1] for item in resultat])
+        #cette liste sert à évaluer la performance de la méthode choisie
+        tous_groupes=[item[2] for item in resultat]
+        tous_groupes=[item for sublist in tous_groupes for item in sublist]
+        #interruptions
+        interrompu=sum([item[3] for item in resultat])
         #trier par numéro de chaise en ordre croissant
         exclus_final = exclus_final[exclus_final[:, 0].argsort()]
         #calculer la capacité optimale finale de la salle
@@ -252,11 +260,6 @@ class Voisins_exclus:
         self.tableau_perfo = pd.DataFrame(tableau_perfo, columns=['Num_groupe','Nombre chaises','Iteration_best'])
         self.tous_groupes = tous_groupes
         self.tableau_optimal=meilleur_tableau
-        
-        #sortie finale : on retourne le meilleur tableau et le temps écoulé
-        # liste_finale = []
-        # liste_finale.append(meilleur_tableau)
-        # liste_finale.append(self.total_time)
 
         return meilleur_tableau,self.total_time
     
