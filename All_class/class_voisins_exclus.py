@@ -113,17 +113,22 @@ class Voisins_exclus:
                     else:
 
                         
-                        if self.methode==2 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
+                        if self.methode==2 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
                             #trouver plus proche voisin admissible
-                            voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la distance spécifiée 
      
-                            if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
-                                prochaine_chaise = random.choice(chaises[en_jeu]) #choisir au hasard 
-    
-                            else:                  
-                                dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, prendre le premier)
-                                index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
-                                prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
+                            if while_index==0: #si première boucle
+                                prochaine_chaise = chaises[0] #choisir chaise #1 (baseline)
+                                
+                            else:
+                                voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la distance spécifiée 
+     
+                                if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
+                                    prochaine_chaise = random.choice(chaises[en_jeu]) #choisir au hasard 
+        
+                                else:                  
+                                    dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, prendre le premier)
+                                    index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
+                                    prochaine_chaise = chaises[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
                  
                         elif self.methode==3 and while_index>0 and sum(en_jeu)>1:  #si algorithme plus loin voisin est choisi et si on est à la 2e boucle while 
                             #trouver plus loin voisin admissible
