@@ -77,6 +77,9 @@ class Voisins_exclus:
                                      
         #nombre de groupes
         nombre_groupes = set(donnees[:,4].tolist()) 
+        
+        #entreposer le résultat de tous les groupes
+        tous_groupes=[]
             
         #boucle pour chaque groupe
         def calcul_groupe(i):
@@ -105,14 +108,13 @@ class Voisins_exclus:
                         #methode == 3 : plus loin voisin
                         #methode ==4 : weighed random avec pourcentage
                         
-                    if len(subset)==1 or len(subset)==2: #si qu'une chaise dans ce groupe
-                        subset[0,3]=1 #assigner chaise occupée à la seule chaise dispo pour cette itération
+                    if len(subset)==1 or len(subset)==2: #si qu'une ou deux chaises dans ce groupe
+                        subset[0,3]=1 #assigner première chaise comme occupée 
                         exclus=subset[:,0:4]
                         chaises[0:4]=[0,0,0,0]
                         
                     else:
 
-                        
                         if self.methode==2 and sum(en_jeu)>1:  #si algorithme plus proche voisin est choisi et si on est à la 2e boucle while 
                             #trouver plus proche voisin admissible
      
@@ -175,7 +177,7 @@ class Voisins_exclus:
                         else: #méthode==1
                             prochaine_chaise = random.choice(chaises[en_jeu]) #choisir chaise au hasard parmi celles en jeu
                         
-                        prochaine_chaise[3]=1 #assigner groupe à 1 
+                        prochaine_chaise[3]=1 #assigner occupation à 1 
                         couple = prochaine_chaise[1:3] #x et y de la chaise sélectionnée
                         dist_eucl = (chaises[:,1:3] - couple)**2 #différence entre les x,y du couple et ceux de toutes les autres chaises
                         dist_eucl = dist_eucl.sum(axis=-1) #somme de la différence x,y
@@ -185,7 +187,7 @@ class Voisins_exclus:
                             dist_eucl[hors_jeu] = np.zeros(hors_jeu.sum()) #dist. eucl. entre couple et chaises hors jeu = 0 
                         condition = ((dist_eucl<self.distance) & (dist_eucl>0)) #boolean chaises à <(distanciation)m et >0m
                         exclus[condition]=chaises[condition] #ajouter ces chaises trop proche aux exclus
-                        exclus[choisie] = prochaine_chaise #ajouter chaise sélectionnée avec groupe=1 à l'array
+                        exclus[choisie] = prochaine_chaise #ajouter chaise sélectionnée avec occupation=1 à l'array
                         chaises[condition]=np.zeros(((condition.sum()),4)) #retirer couples exclus du array des chaises actives
                         chaises[choisie]=np.zeros((1,4)) #retirer chaise choisie du array des chaises actives
                 
@@ -196,10 +198,9 @@ class Voisins_exclus:
                 #ajouter la somme des chaises occupées
                 somme_iterations.append(exclus[:,3].sum())
 
-
-                if self.analyse_perfo==False:
+            
+                if self.analyse_perfo==True:
                     #entreposer toutes les configurations de chaque itération pour tous les groupes
-                    tous_groupes=[]
                     #ajouter le # de groupe, le # de l'itération et la somme des chaises occupées
                     tous_groupes.append([i,j,exclus[:,3].sum(),self.methode])
 
@@ -219,7 +220,7 @@ class Voisins_exclus:
             meilleur_subset=resultat_iterations[index_best] #retenir tableau optimal à cet index           
             nombre_chaises = len(meilleur_subset) #nombre de chaises de ce sous-groupe
 
-            if self.analyse_perfo==False:
+            if self.analyse_perfo==True:
                 return([[i,nombre_chaises,index_best], meilleur_subset,tous_groupes, interrompu]) #sortir tableau perfo, meilleur tableau, tous les tableaux de toutes les itérations pour ce groupe, avis d'interruption
             else:
                 return([[i,nombre_chaises,index_best], meilleur_subset,[0], interrompu]) #éviter de sortir les données perfo
