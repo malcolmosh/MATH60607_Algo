@@ -10,6 +10,7 @@ Created on Mon Oct 25 17:19:59 2021
 import random #sélection aléatoire
 import numpy as np
 import time
+import copy
  
 #pour graphe
 import plotly.io as pio
@@ -40,7 +41,8 @@ class Voisins_exclus:
        
         #vérifier l'heure
         start=time.time()
-        
+        start_max_time=time.time()
+
         # entreposer les orientations (south,west,east,north)
         orientations = [row[1] for row in donnees]
         # retirer la colonne des orientations du fichier de données   
@@ -91,8 +93,13 @@ class Voisins_exclus:
             meilleur_tableau=subset[:,0:4].copy()
             #entreposer la meilleure somme de chaises occupées
             meilleure_somme=meilleur_tableau[:,3].sum()
-
-            for j in range(self.iterations): 
+            #variable indicatrice de changement pour entreposer l'itération avec le dernier changement
+            dernier_changement=0
+            #compteur_iteration
+            compteur=0
+            
+            while (compteur-dernier_changement)<=self.iterations and (time.time()-start_max_time)<=self.maximum_time:
+                #arrêter si on n'a pas fait d'améliorations depuis self.iterations ou si on a dépassé le temps imparti en paramètre 
                 
                 #initialiser tableau initial des chaises du sous-groupe, avec 4 colonnes (num, x, y, occupation)
                 tableau_initial=subset[:,0:4].copy() 
@@ -101,7 +108,6 @@ class Voisins_exclus:
                 #créer un indicateur des boucles du while
                 while_index = 0 
                 
-
                 while (tableau_initial[:,1:4].sum()>0): #pendant qu'il y a encore des chaises encore en jeu 
                     en_jeu= (tableau_initial[:,1:4].sum(axis=-1)>0) #boolean chaises qui sont en jeu
                     hors_jeu = (tableau_initial[:,1:4].sum(axis=-1)==0) #boolean chaises qui ne sont plus en jeu
@@ -204,23 +210,20 @@ class Voisins_exclus:
                 #somme des chaises de cette itération
                 somme_actuelle=tableau_final[:,3].sum()
                 
-                #si somme est meilleure que la meilleure somme jusqu'à présent dans les itérations précédente, assigner ce tableau comme meilleur tableau
+                #si somme actuelle est meilleure que la meilleure somme jusqu'à présent dans les itérations, assigner ce tableau actuel comme meilleur tableau
                 if somme_actuelle>meilleure_somme:
                     meilleure_somme=somme_actuelle
                     meilleur_tableau=tableau_final
-                    
+                    dernier_changement=copy.deepcopy(compteur)
+                    start_max_time=time.time()
+                                 
                 #si on veut sortir les stats d'amélioration successive pour l'algo
                 if self.analyse_perfo==True:
                     #ajouter num groupe, num itération, meilleur somme atteinte et methode
-                    tableau_perfo.append([i,j, meilleure_somme,self.methode])
+                    tableau_perfo.append([i,compteur, meilleure_somme,self.methode])
                     
-                #early stopping with time
-                time_now = time.time() #moment de fin de l'itération 
-                potential_end = (time_now - start)/60 #temps écoulé en minutes depuis le début de l'algorithme
-                       
-                #si le temps actuel dépasse le temps maximum spécifié en paramètre, arrête
-                if potential_end >= self.maximum_time:
-                    break
+                #augmenter le compteur d'iteration
+                compteur+=1
             
             #sortir le meilleur tableau d'occupation pour ce sous-groupe de chaises
             return(meilleur_tableau) 
