@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Thu Dec  2 18:22:39 2021
-
 @author: osher
 """
 
@@ -23,14 +22,14 @@ banque= "Salle Banque Scotia.txt"
 cogeco = "Salle Cogeco.txt"
 manuvie = "Salle Manuvie.txt"
 saine = "Salle Saine Marketing.txt"
-info, salle_classe = test.chairs_list_test(banque)
+info, salle_classe = test.chairs_list_test(saine)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=500, methode=4, division=0)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=800, methode=4, division=0, analyse_perfo=True)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
-optimize1.graphe_sortie()
+#optimize1.graphe_sortie()
 optimize1.temps()
 
 
@@ -172,7 +171,7 @@ def generer_barplot(data):
     fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=banque, metaloops=1, distance=2, iterations=10000, division=0)
+titre, details, data_graphe, derniere_iter_max, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=1, distance=2, iterations=50, division=1)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, derniere_iter_max=derniere_iter_max, max_chaises_atteint=max_chaises_atteint)
 
