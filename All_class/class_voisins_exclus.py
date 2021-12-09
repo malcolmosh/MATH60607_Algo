@@ -10,7 +10,6 @@ Created on Mon Oct 25 17:19:59 2021
 import random #sélection aléatoire
 import numpy as np
 import time
-import copy
  
 #pour graphe
 import plotly.io as pio
@@ -21,11 +20,11 @@ import pandas as pd
 #créer classe
 class Voisins_exclus:
     
-    def __init__(self, data,distance,iterations=500, maximum_time=5, methode=1, division=0, analyse_perfo=False):
+    def __init__(self, data,distance,iterations=1000, maximum_time=5, methode=1, division=0, analyse_perfo=False):
         self.data = data
         self.distance = distance
         self.iterations = iterations
-        self.maximum_time = maximum_time
+        self.maximum_time = maximum_time*60 #en secondes
         self.methode=methode
         self.division = division
         self.tableau_optimal=()
@@ -41,7 +40,7 @@ class Voisins_exclus:
        
         #vérifier l'heure
         start=time.time()
-        start_max_time=time.time()
+        self.start_max_time=time.time()
 
         # entreposer les orientations (south,west,east,north)
         orientations = [row[1] for row in donnees]
@@ -88,7 +87,6 @@ class Voisins_exclus:
         
             #sélectionner les chaises de ce groupe
             subset = donnees[np.where(donnees[:,4] ==i)]
-            
             #entroposer le meilleur tableau du groupe dans un array
             meilleur_tableau=subset[:,0:4].copy()
             #entreposer la meilleure somme de chaises occupées
@@ -98,9 +96,9 @@ class Voisins_exclus:
             #compteur_iteration
             compteur=0
             
-            while (compteur-dernier_changement)<=self.iterations and (time.time()-start_max_time)<=self.maximum_time:
-                #arrêter si on n'a pas fait d'améliorations depuis self.iterations ou si on a dépassé le temps imparti en paramètre 
-                
+            #arrêter si on n'a pas fait d'améliorations depuis self.iterations ou si on a dépassé le temps imparti en paramètre 
+            while (compteur-dernier_changement)<=self.iterations and (time.time()-self.start_max_time)<=self.maximum_time:
+
                 #initialiser tableau initial des chaises du sous-groupe, avec 4 colonnes (num, x, y, occupation)
                 tableau_initial=subset[:,0:4].copy() 
                 #initialiser liste vide de chaises. nous allons vider la liste initiale peu à peu pour déplacer les chaises vers cette liste finale. 
@@ -214,7 +212,7 @@ class Voisins_exclus:
                 if somme_actuelle>meilleure_somme:
                     meilleure_somme=somme_actuelle
                     meilleur_tableau=tableau_final
-                    dernier_changement=copy.deepcopy(compteur)
+                    dernier_changement=compteur
                     start_max_time=time.time()
                                  
                 #si on veut sortir les stats d'amélioration successive pour l'algo
