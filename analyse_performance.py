@@ -12,7 +12,7 @@ import plotly.express as px
 
 ##test avec mes classes
 from All_class.class_dataset import Salles
-from All_class.class_voisins_exclus import Voisins_exclus
+from All_class.class_voisins_exclus_v2 import Voisins_exclus
 
 #importation données
 test=Salles(app=False)
@@ -26,17 +26,19 @@ info, salle_classe = test.chairs_list_test(saine)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=800, methode=4, division=0, analyse_perfo=True)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=800, methode=4, division=1, analyse_perfo=True)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
 #optimize1.graphe_sortie()
 optimize1.temps()
+optimize1.tableau_perfo
+optimize1.tous_groupes
 
 
 #optimize1.graphe_sortie()
 # tous_groupes = optimize1.tous_groupes
 # #
-# # optimize1.tableau_perfo
+# # optimize1.tous_groupes
 # optimize1.interruption()
 # # optimize1.graphe_entree()
 
