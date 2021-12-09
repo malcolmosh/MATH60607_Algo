@@ -40,7 +40,7 @@ class Voisins_exclus:
        
         #vérifier l'heure
         start=time.time()
-
+        
         # entreposer les orientations (south,west,east,north)
         orientations = [row[1] for row in donnees]
         # retirer la colonne des orientations du fichier de données   
