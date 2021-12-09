@@ -6,8 +6,6 @@ from tkinter.font import Font
 from PIL import Image,ImageTk,ImageGrab
 from sys import exit
 from All_class.class_dataset import Salles
-from All_class.class_optimization_random import Optimization_random
-from All_class.class_optimization_des_sections import Optimization_des_sections
 from All_class.class_voisins_exclus import Voisins_exclus
 
 class Application():
