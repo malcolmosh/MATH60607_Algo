@@ -27,13 +27,13 @@ info, salle_classe = test.chairs_list_test(saine)
 
 
 # algo olivier
-optimize1=Voisins_exclus(salle_classe,distance=2, iterations=800, methode=4, division=0, analyse_perfo=True)
+optimize1=Voisins_exclus(salle_classe,distance=2, iterations=50, methode=2, division=1, analyse_perfo=True)
 tableau, temps = optimize1.optimize()
 optimize1.resultat()
 #optimize1.graphe_sortie()
 optimize1.temps()
 optimize1.tableau_perfo
-optimize1.tous_groupes
+#optimize1.tous_groupes
 
 optimize1.tableau_perfo.to_excel("file.xlsx")
 
@@ -83,7 +83,18 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     data_graphe = data_graphe.groupby(["epoch","Methode", "Methode_txt", "Num_iter"], as_index=False).sum()
     data_graphe=data_graphe.drop(columns="Num_groupe")
     
-   
+        #ajuster avec le maximum 
+    #remplacer le nombre de chaises dans chaque epoch, méthode et dans chaque groupe par le maximum, une fois qu'il est atteint
+    data_np = np.array(data_graphe)
+    data_graphe.columns
+    for i in range (1,len(data_np)):
+        if data_np[i,0]==data_np[i-1,0] and data_np[i,1]==data_np[i-1,1]: #si epoch, methode sont pareis
+            if data_np[i,4]<=data_np[i-1,4]: #si meilleur résultat itération précédente, remplacer
+                data_np[i,4]=data_np[i-1,4]
+
+    #reconvertir en pandas
+    data_graphe = pd.DataFrame(data_np, columns=data_graphe.columns)
+    
     #moyenne au travers des méta-loops
     data_graphe= data_graphe.groupby(['Methode','Methode_txt','Num_iter'],as_index=False).mean()
     data_graphe = data_graphe.drop(columns="epoch")
@@ -147,8 +158,8 @@ def generer_barplot(data):
         'scale': 5 }} # Multiply title/legend/axis/canvas sizes by this factor 
     #produire graphe  pour comparer le nombre de chaise atteint au travers des méta-itérations
     data2=data.groupby(["Methode_txt","Best_somme_atteinte"], as_index=False).count()
-    data2['nb_chaises']=pd.Categorical(data2['nb_chaises'].astype(int))
-    fig = px.bar(data2,x="Methode", y="epoch", color="Best_somme_atteinte",
+    data2['Best_somme_atteinte']=pd.Categorical(data2['Best_somme_atteinte'].astype(int))
+    fig = px.bar(data2,x="Methode_txt", y="epoch", color="Best_somme_atteinte",
                  title=titre+"<br><sup>"+details+"</sup>",
                  labels=dict(epoch="Nombre de méta-itérations", Best_somme_atteinte="Capacité calculée", Methode="Méthode utilisée"))
     fig.update_layout(barmode='group')
@@ -160,7 +171,11 @@ def generer_barplot(data):
     fig.show(config=config)
 
 #faire graphe 
-titre, details, data_graphe, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=1, distance=2, iterations=10000, division=0)
+
+from All_class.class_voisins_exclus import Voisins_exclus
+
+
+titre, details, data_graphe, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=1, distance=2, iterations=50, division=1)
 
 generer_graphe(titre=titre, details=details, data=data_graphe, max_chaises_atteint=max_chaises_atteint)
 

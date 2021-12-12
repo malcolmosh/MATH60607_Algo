@@ -107,9 +107,7 @@ class Voisins_exclus:
                 tableau_final=np.zeros((len(tableau_initial),4))
                 #créer un indicateur des boucles du while
                 while_index = 0 
-                
-                
-                
+                                
                 while (tableau_initial[:,1:4].sum()>0): #pendant qu'il y a encore des chaises encore en jeu 
                     en_jeu= (tableau_initial[:,1:4].sum(axis=-1)>0) #boolean chaises qui sont en jeu
                     hors_jeu = (tableau_initial[:,1:4].sum(axis=-1)==0) #boolean chaises qui ne sont plus en jeu
@@ -118,28 +116,32 @@ class Voisins_exclus:
                         
                     #si il n'y a q'une ou deux chaises dans ce groupe
                     if len(subset)==1 or len(subset)==2: 
-                        subset[0,3]=1 #assigner première chaise comme occupée 
-                        tableau_final=subset[:,0:4]
-                        tableau_initial[0:4]=[0,0,0,0]
-                        
-                    #assigner chaise 1 au prof
-                    #si on est à l'itération 1, occuper la chaise 1 (prof) et exclure les voisins inadmissibles
-                    elif while_index==0:
-                        prochaine_chaise = tableau_initial[0] #choisir chaise #1 (baseline)
+                        prochaine_chaise = tableau_initial[0] #assigner première chaise comme occupée 
+                       
+                    #si on est à l'itération 0 et que la chaise #1 est dans le groupe, l'occuper
+                    #cette section pourrait être peaufinée pour occuper des numéros de chaise prédéterminés et pas juste la chaise numéro 1
+                    elif while_index==0 and np.where(tableau_initial[:,0]==1)[0].size==1:
+                        index_chaise_1=np.where(tableau_initial[:,0]==1)[0][0]
+                        prochaine_chaise = tableau_initial[index_chaise_1] #choisir chaise #1 (baseline)
 
                     #sinon utilisons la méthode spécifiée
                     #plus proche voisin et si plus d'une chaise en jeu
                     elif self.methode==2 and sum(en_jeu)>1:
-                                                   
-                        voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la distance spécifiée 
- 
-                        if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
-                            prochaine_chaise = random.choice(tableau_initial[en_jeu]) #choisir au hasard 
-
-                        else:                  
-                            dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, prendre le premier)
-                            index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
-                            prochaine_chaise = tableau_initial[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
+                                
+                        #toujours prendre d'abord la première chaise (pour servir de méthode baseline)
+                        if while_index==0 :
+                            prochaine_chaise=tableau_initial[0]
+                            
+                        else:
+                            voisins = dist_eucl[en_jeu] # retenir toutes les chaises à plus de la distance spécifiée 
+     
+                            if (min(voisins)==max(voisins)): #si voisins min et max sont à la même distance
+                                prochaine_chaise = random.choice(tableau_initial[en_jeu]) #choisir au hasard 
+    
+                            else:                  
+                                dist_proche_voisin = min(voisins) #trouver voisin le plus proche (si il y en a deux, prendre le premier)
+                                index = dist_eucl.tolist().index(dist_proche_voisin) #index de cette chaise dans la liste des distances euclidiennes
+                                prochaine_chaise = tableau_initial[index]  #désigner la prochaine chaise : sélectionner la proche chaise dans le array des chaises en jeu
              
                     #plus loin voisin 
                     elif self.methode==3 and while_index>0 and sum(en_jeu)>1:  #si on est à la 2e boucle while 
