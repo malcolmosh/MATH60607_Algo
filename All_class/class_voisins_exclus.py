@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 """
 Created on Mon Oct 25 17:19:59 2021
-
 @author: osher
+
 """
 ## importation packages
 #pour optiimisation
@@ -39,8 +39,7 @@ class Voisins_exclus:
         donnees=(self.data) #fichier donnees en entree
        
         #vérifier l'heure
-        start=time.time()
-        self.start_max_time=time.time()
+        self.start=time.time()
 
         # entreposer les orientations (south,west,east,north)
         orientations = [row[1] for row in donnees]
@@ -96,10 +95,9 @@ class Voisins_exclus:
             #compteur_iteration
             compteur=0
                         
-            
             #les itérations commencent ici
             #arrêter si on n'a pas fait d'améliorations depuis self.iterations ou si on a dépassé le temps imparti en paramètre 
-            while (compteur-dernier_changement)<=self.iterations and (time.time()-self.start_max_time)<=self.maximum_time:
+            while (compteur-dernier_changement)<=self.iterations and (time.time()-self.start)<=self.maximum_time:
 
                 #initialiser tableau initial des chaises du sous-groupe, avec 4 colonnes (num, x, y, occupation)
                 tableau_initial=subset[:,0:4].copy() 
@@ -217,7 +215,6 @@ class Voisins_exclus:
                     meilleure_somme=somme_actuelle
                     meilleur_tableau=tableau_final
                     dernier_changement=compteur
-                    start_max_time=time.time()
                                  
                 #si on veut sortir les stats d'amélioration successive pour l'algo
                 if self.analyse_perfo==True:
@@ -257,10 +254,10 @@ class Voisins_exclus:
             
         #calculer temps écoulé pour tout l'algorithme
         end=time.time()
-        total_time = (end - start)
+        total_time = (end - self.start)
         
         #indicateur d'interruption : voir si on dépassé le temps imparti
-        potential_end = (end - start)/60
+        potential_end = (end - self.start)/60
         if potential_end >= self.maximum_time:
             interrompu=1
         else:

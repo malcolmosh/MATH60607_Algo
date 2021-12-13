@@ -83,8 +83,10 @@ def generer_donnees(salle, metaloops, distance, iterations, division):
     data_graphe = data_graphe.groupby(["epoch","Methode", "Methode_txt", "Num_iter"], as_index=False).sum()
     data_graphe=data_graphe.drop(columns="Num_groupe")
     
-        #ajuster avec le maximum 
+    #ajuster avec le maximum 
     #remplacer le nombre de chaises dans chaque epoch, méthode et dans chaque groupe par le maximum, une fois qu'il est atteint
+    #sert dans le cas des graphes de performance avec division=1. Quand il y a qu'une chaise dans un groupe, elle atteint son max à l'itération 0 et arrête à 50
+    #d'autres groupes vont arrêter plus loin, il faut donc ajuster le graphe
     data_np = np.array(data_graphe)
     data_graphe.columns
     for i in range (1,len(data_np)):
@@ -170,37 +172,12 @@ def generer_barplot(data):
     #fig.write_image("Graphes/"+nom_fichier+"_bar.png",engine="kaleido", scale=5)
     fig.show(config=config)
 
-#faire graphe 
 
-from All_class.class_voisins_exclus import Voisins_exclus
-
-
+#générer les données
 titre, details, data_graphe, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=1, distance=2, iterations=50, division=1)
 
+#produire le graphe de performance
 generer_graphe(titre=titre, details=details, data=data_graphe, max_chaises_atteint=max_chaises_atteint)
 
+#produire le graphe de comparaisons des résultats au travers des méta-itérations
 generer_barplot(data=data_boxplot)
-
-#comparatif temps
-# #PAS parallèle
-# from All_class.class_voisins_exclus import Voisins_exclus
-# info, salle_classe = test.chairs_list_test(mega)
-# optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
-# tableau, temps = optimize1.optimize()
-# temps_non_para=temps
-
-# #parallélisé
-# from All_class.class_voisins_exclus_para import Voisins_exclus
-# info, salle_classe = test.chairs_list_test(mega)
-# optimize1=Voisins_exclus(salle_classe,distance=2, iterations=5000, methode=1, division=1)
-# tableau, temps = optimize1.optimize()
-# temps_para=temps
-
-# data_parallele=pd.DataFrame((round(temps_non_para,1),round(temps_para,1)), columns=["Temps en secondes"])
-# data_parallele['Stratégie']=["Non parallélisé", "Parallélisé"]
-
-# #
-# fig = px.bar(data_parallele,x="Stratégie", y="Temps en secondes",title="Performance de la parallélisation - salle de 1105 sièges divisée en groupes,5000 itérations")
-# fig.show()
-
-#https://stackoverflow.com/questions/21027477/joblib-parallel-multiple-cpus-slower-than-single
