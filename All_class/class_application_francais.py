@@ -111,9 +111,10 @@ class Application():
         self.label_data_actual = Label(self.frame_settings,text=self.gui_settings["Data_name"],anchor="w",bg="#4A6572",fg="#ffffff",width=20)
         self.button_data = Button(self.frame_settings, text="Choisir un jeu de données",command=self.pick_file, fg="#000000",width=25, height=1)
 
-        self.label_data.grid(       row=1,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.label_data_actual.grid(row=1,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.button_data.grid(      row=1,  column=2,   columnspan=1, sticky="e",   padx=(0,10),    pady=(10,10))
+        self.label_data.grid(       row=1,  column=0,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,10))
+        self.button_data.grid(      row=1,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+        self.label_data_actual.grid(row=1,  column=2,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,0))
+        
 
         #Settings - Algorithm
         #List of the available algorithm
@@ -124,29 +125,32 @@ class Application():
         self.combobox_algorithm.set("Choisir un algorithme")
         self.combobox_algorithm.bind("<<ComboboxSelected>>",self.comboclick)
         
-        self.label_algorithm.grid(          row=2,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.label_algorithm_actual.grid(   row=2,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.combobox_algorithm.grid(       row=2,  column=2,   columnspan=1, sticky="e",   padx=(0,10),    pady=(10,10))
+        self.label_algorithm.grid(          row=2,  column=0,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,10))
+        self.combobox_algorithm.grid(       row=2,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+        self.label_algorithm_actual.grid(   row=2,  column=2,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,0))
+        
 
         #Settings - Iteration
         self.iteration_var = IntVar(value=int(self.gui_settings["Iterations"]))
-        self.label_iteration = Label(self.frame_settings, text="Nombre d'itérations",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_iteration = Label(self.frame_settings, text="Nombre d'itérations sans\n amélioration par groupe",width=20,height=2,anchor="w",bg="#4A6572",fg="#ffffff")
         self.label_scale_iteration_actual = Label(self.frame_settings,width=10, textvariable=self.iteration_var,anchor="w",bg="#4A6572",fg="#ffffff")
         self.scale_iteration = Scale(self.frame_settings, from_=50, to=10000,resolution=50, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.iteration_var,command=self.scale_iteration,state=DISABLED)
         
-        self.label_iteration.grid(                  row=3,  column=0,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.label_scale_iteration_actual.grid(     row=3,  column=1,   columnspan=1, sticky="w",   padx=(10,10),   pady=(10,0))
-        self.scale_iteration.grid(                  row=3,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
+        self.label_iteration.grid(                  row=3,  column=0,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,0))
+        self.scale_iteration.grid(                  row=3,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+        self.label_scale_iteration_actual.grid(     row=3,  column=2,   columnspan=1, sticky="w",   padx=(10,0),   pady=(10,0))
+        
 
         #Settings - Maximum time
         self.maximum_time_var = IntVar(value=int(self.gui_settings["Time"]))
-        self.label_maximum_time = Label(self.frame_settings, text="Durée maximale (minutes)",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_maximum_time = Label(self.frame_settings, text="Durée maximale totale\n(minutes)",width=20,height=2,anchor="w",bg="#4A6572",fg="#ffffff")
         self.label_maximum_time_actual = Label(self.frame_settings,width=10,textvariable=self.maximum_time_var,anchor="w",bg="#4A6572",fg="#ffffff")
         self.scale_maximum_time = Scale(self.frame_settings, from_=5, to=120,resolution=5, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.maximum_time_var,command=self.scale_time, state=DISABLED)
         
-        self.label_maximum_time.grid(       row=4,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
-        self.label_maximum_time_actual.grid(row=4,  column=1,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
-        self.scale_maximum_time.grid(       row=4,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
+        self.label_maximum_time.grid(       row=4,  column=0,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+        self.scale_maximum_time.grid(       row=4,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))        
+        self.label_maximum_time_actual.grid(row=4,  column=2,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+
 
         #Settings - Distance
         self.distance_var = DoubleVar(value=float(self.gui_settings["Distance"]))
@@ -154,18 +158,19 @@ class Application():
         self.label_distance_actual = Label(self.frame_settings,width=10,textvariable=self.distance_var,anchor="w",bg="#4A6572",fg="#ffffff")
         self.scale_distance = Scale(self.frame_settings, from_=0.1, to=5.00,resolution=0.1, orient=HORIZONTAL,width=15,length=100,showvalue=0, variable=self.distance_var,command=self.scale_distance, state=DISABLED)
         
-        self.label_distance.grid(       row=5,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
-        self.label_distance_actual.grid(row=5,  column=1,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
-        self.scale_distance.grid(       row=5,  column=2,   columnspan=1, sticky="e",   padx=(10,30),    pady=(10,10))
+        self.label_distance.grid(       row=5,  column=0,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,10))
+        self.scale_distance.grid(       row=5,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))        
+        self.label_distance_actual.grid(row=5,  column=2,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+
 
         #Settings - Group_approach
         self.group_approach = BooleanVar()
-        self.label_group_approach = Label(self.frame_settings, text="Utiliser l'approche groupe",width=20,height=1,anchor="w",bg="#4A6572",fg="#ffffff")
+        self.label_group_approach = Label(self.frame_settings, text="Utiliser l'approche de\ndivision par groupe",width=20,height=2,anchor="w",bg="#4A6572",fg="#ffffff")
         self.button_group_approach = Checkbutton(self.frame_settings,text="", variable = self.group_approach,state=DISABLED, width=20, height=1, command=self.use_group)
         
         #self.group_approach.set(False)
-        self.label_group_approach.grid(         row=6,  column=0,   columnspan=1, sticky="w",   padx=(10,10),    pady=(10,0))
-        self.button_group_approach.grid(        row=6,  column=2,   columnspan=1, sticky="e",   padx=(10,20),    pady=(10,10))
+        self.label_group_approach.grid(         row=6,  column=0,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
+        self.button_group_approach.grid(        row=6,  column=1,   columnspan=1, sticky="w",   padx=(10,0),    pady=(10,0))
 
         #Button - Optimization
         self.button_optimisation = Button(self.frame_buttons,text="Optimiser la salle!",command=self.optimization,bg="#F9AA33",fg="#000000",state=DISABLED, width=41, height=3)
@@ -222,6 +227,8 @@ class Application():
         text = self.canvas_graph.create_text(coordinates_time, text = f"{round(self.duree,2)} secondes", anchor="e",fill="#ffffff")
         text = self.canvas_graph.create_text(coordinates_group, text = f"{int(self.nb_group)} groupes", anchor="e",fill="#ffffff")
     def comboclick(self,event):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.gui_settings["Algorithm"] = str(self.combobox_algorithm.get())
@@ -229,20 +236,28 @@ class Application():
         self.combobox_algorithm.set("Choisir un algorithme")
 
     def scale_iteration(self,value):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.gui_settings["Iterations"] = int(value)
     
     def scale_time(self,value):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.gui_settings["Time"] = int(value)
 
     def scale_distance(self,value):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.gui_settings["Distance"] = float(value)
     def use_group(self):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         group = self.group_approach.get()
@@ -253,6 +268,8 @@ class Application():
         groups = self.show_groups.get()
         self.draw_chairs(state="after",radius=radius,groups=groups)
     def pick_file(self,reoptimize=False):
+        self.show_groups.set(False)
+        self.show_radius.set(False)
         self.button_show_radius.configure(state=DISABLED)
         self.button_show_groups.configure(state=DISABLED)
         self.button_optimisation.configure(state=DISABLED)
@@ -289,7 +306,8 @@ class Application():
             print("Fichier non valide")
 
     def optimization(self):
-        
+        self.show_groups.set(False)
+        self.show_radius.set(False)        
         for chair in range(0,len(self.chairs)):
             self.chairs[chair][4] = bool(0)
             while len(self.chairs[chair])>=6:
@@ -343,19 +361,13 @@ class Application():
         path = f"{pathlib.Path(__file__).parents[1]}/Font_graphics/"
         desk_brown = (Image.open(f"{path}desk_brown.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
         desk_green = (Image.open(f"{path}desk_green.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
-        desk_red = (Image.open(f"{path}desk_red.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
-        desk_yellow = (Image.open(f"{path}desk_yellow.png")).resize((new_desk_size,new_desk_size), Image.ANTIALIAS)
         
         for each in [["south",0],["east",90],["north",180],["west",270]]:
             self.desk_brown_rot = ImageTk.PhotoImage(desk_brown.rotate(each[1]))
             self.desk_green_rot = ImageTk.PhotoImage(desk_green.rotate(each[1]))
-            self.desk_red_rot = ImageTk.PhotoImage(desk_red.rotate(each[1]))
-            self.desk_yellow_rot = ImageTk.PhotoImage(desk_yellow.rotate(each[1]))
 
             self.desk[each[0]]  = { "brown":self.desk_brown_rot,
-                                    "green":self.desk_green_rot,
-                                    "red":self.desk_red_rot,
-                                    "yellow":self.desk_yellow_rot}
+                                    "green":self.desk_green_rot}
 
         #64 pixel = 60 cm    espace = 700x600 pixel 6,56 x 5,62 metres
 
