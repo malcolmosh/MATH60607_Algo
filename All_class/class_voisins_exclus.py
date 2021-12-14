@@ -56,6 +56,17 @@ class Voisins_exclus:
             #ajouter colonne groupe=0 (num, pos_x, pos_y, groupe)
             donnees = [row+[0] for row in donnees]
             donnees = np.array(donnees)
+            
+            #constuire matrice distances euclidiennes
+            mat_dist = np.zeros((len(donnees),len(donnees)))
+            for i in range(0,len(donnees)):
+                point_A=donnees[i,1:3]
+                points_B=donnees[:,1:3]
+                dist = (points_B - point_A)**2
+                dist = np.sum(dist, axis=1)
+                dist = np.sqrt(dist)
+                mat_dist[:,i]=dist
+            mat_dist = mat_dist.round(2)
         
             f=0 #group number holder
             #print(data_dataframe)
@@ -70,7 +81,8 @@ class Voisins_exclus:
                         #pour chaque paire de chaise
                         for j in range(0,len(donnees)):
                             #calculer distance euclidienne
-                            distance_pair=((((donnees[i,1]-donnees[j,1])**2)+((donnees[i,2]-donnees[j,2])**2))**0.5)
+                            distance_pair=mat_dist[i,j]
+                            #distance_pair=((((donnees[i,1]-donnees[j,1])**2)+((donnees[i,2]-donnees[j,2])**2))**0.5)
                             if i!=j and donnees[j,4]==0 and (distance_pair < self.distance):
                                 donnees[j,4]=f
                                 L.append(j) #ajouter ces chaises à la liste pour qu'on donne le même groupe aux chaises à moins de deux mètres

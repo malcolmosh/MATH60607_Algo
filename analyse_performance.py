@@ -174,7 +174,7 @@ def generer_barplot(data):
 
 
 #générer les données
-titre, details, data_graphe, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=1, distance=2, iterations=50, division=1)
+titre, details, data_graphe, data_boxplot, max_chaises_atteint = generer_donnees(salle=saine, metaloops=5, distance=1.5, iterations=10000, division=0)
 
 #produire le graphe de performance
 generer_graphe(titre=titre, details=details, data=data_graphe, max_chaises_atteint=max_chaises_atteint)

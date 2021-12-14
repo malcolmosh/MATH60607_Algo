@@ -1,0 +1,121 @@
+\documentclass[a4paper,french]{article}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{babel}
+\usepackage[linesnumbered,ruled, lined]{algorithm2e}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+
+\begin{document}
+\begin{algorithm}
+
+\caption{Division de l'espace en sous-groupes indépendants}
+\Entree {\begin{itemize}
+\item[] $C_{numsiege,coordX,coordY}$
+\Comment*[r]{Une matrice de n lignes}
+\item[] $d$
+\Comment*[r]{Une distance en mètres}
+\item[] $M_{i,j}$
+\Comment*[r]{Une matrice de dist. eucl. vide}
+\end{itemize}%
+}
+\Sortie{\begin{itemize}
+\item[] $C*_{numsiege,coordX,coordY, \textbf{numgroupe}}$
+\end{itemize}%
+}
+\BlankLine
+Calcul des distances euclidiennes \;
+\PourCh{$i \in C$}{ \:
+\PourCh{$i \in C$}{ $M_{i,j}$=distance euclidienne ${i,j}$ }
+}
+\BlankLine
+Assignation des groupes de chaises \;
+G=0
+\Comment*[r]{Initialiser le compteur de groupe à 0}
+\PourCh{$i \in C$}{ \:
+$i_{numgroupe}$=0
+}
+\PourCh{$n \in C$}{ \:
+    \uSi{$n_{numgroupe}$=0}{
+      G+=1 \;
+      {$n_{numgroupe}$=G} \Comment*[r]{Assigner la chaise au groupe G}
+      L=$[n]$ \Comment*[r]{Créer une liste avec l'élément n}
+
+      \PourCh{$i \in L$}{
+      \PourCh{$j \in C$} %\Comment*[r]{Examiner les voisins de la chaise choisie}
+      {
+      \uSi{$i!=j$ ET $M_{i,j} < d$}{
+      {$j_{numgroupe}$=G} \Comment*[r]{Ajouter le voisin non-distancé au même groupe}
+      L.append(j)  \Comment*[r]{L'ajouter à la liste L pour itérer à travers ses voisins}
+      }
+      }
+      }
+    }
+
+}
+
+\end{algorithm}
+
+\BlankLine
+\BlankLine
+\BlankLine
+
+\begin{algorithm}
+
+\caption{Allocation des sièges}
+\Entree {\begin{itemize}
+\item[] $C_{numsiege,coordX,coordY}$
+\Comment*[r]{Une matrice de n lignes}
+\item[] $F_{numsiege,coordX,coordY,assignation}$
+\Comment*[r]{Une matrice de n lignes, vide ou remplie de zéros}
+\item[] $L$
+\Comment*[r]{Une liste vide}
+\item[] $d$
+\Comment*[r]{Une distance en mètres}
+\item[] $iter$
+\Comment*[r]{Un nombre maximal d'itérations de stagnation}
+\end{itemize}%
+}
+\Sortie{\begin{itemize}
+\item[] $F_{numsiege,coordX,coordY,assignation}$
+\Comment*[r]{Une matrice de n lignes avec l'assignation des chaises}
+\end{itemize}%
+}
+
+\BlankLine
+Allocation des chaises \;
+
+compteur = 0
+\Comment*[r]{Compteur des boucles while}
+dernierchangement = 0
+\Comment*[r]{Le numéro de boucle avec la dernière amélioration}
+solutionoptimale = 0
+\Comment*[r]{La solution initiale}
+
+\Tq{$(compteur-dernierchangement) > iter$}{ 
+  \Tq{$C > 0$}{ 
+  Choisir $numsiege$ au hasard entre $0,n$ 
+  $i$=$numsiege$
+  $F_{i}=C_{i}$ \Comment*[r]{Copier la ligne i dans F à la même position}
+  $F_{i,assignation}=1$  \Comment*[r]{Assigner l'occupation à 1}
+   \PourCh{$j \in C$}{ 
+        dist= distance euclidienne $C_{i,j}$\;
+          \uSi{dist > d ET dist > 0}{
+            $F_{j}=C_{j}$ \Comment*[r]{Copier la ligne j dans F à la même position}
+            $F_{j,assignation}=1$   \Comment*[r]{Assigner occupation à 0 (trop proche)}
+            $C_{j}$=0  \Comment*[r]{Retirer de C}
+          }
+        }
+        $C_{i}$=0   \Comment*[r]{Retirer de C}
+    }
+S=somme($F_{assignation}$)\;
+\uSi{S > solutionoptimale}{ \Comment*[r]{Si la solution act. est meilleure que la solution opt.}
+solutionoptimale = S \Comment*[r]{Affecter sol. actuelle comme solution opt.}
+dernierechangement=compteur \Comment*[r]{Enregistrer l'itération avec l'amélioration}
+}
+
+Compteur+=1
+
+}
+
+\end{algorithm}
+\end{document}
