@@ -8,4 +8,4 @@ Collaborateurs :
 - Olivier Simard-Hanley 
 - Mahnaz Golshan 
 
-Programme construit pour le cours MATH60607 : Algorithmes pour l'optimisation et l'analyse des mégadonnées
+Programme construit à l'automne 2021 pour le cours MATH60607 : Algorithmes pour l'optimisation et l'analyse des mégadonnées enseigné par M. Gilles Caporossi.
